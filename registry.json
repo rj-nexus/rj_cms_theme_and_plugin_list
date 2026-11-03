@@ -11,12 +11,12 @@
             "tags": ["minimal", "blog"]
         }
     ],
-        "themes": [
+    "themes": [
         {
             "repo": "rj-nexus/velvet-aura",
             "verified": true,
             "featured": true,
-            "category": "ecommerce",
+            "category": "general",
             "tags": ["minimal", "shop", "e-commerce"]
         }
     ],
