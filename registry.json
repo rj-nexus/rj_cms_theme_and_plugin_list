@@ -1,30 +1,30 @@
 {
-    "$schema": "./schema/registry.schema.json",
-    "version": "1.0",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "themes": [
-        {
-            "repo": "mr-ruhid/rj-theme-default",
-            "verified": true,
-            "featured": false,
-            "category": "general",
-            "tags": ["minimal", "blog"]
-        },
-        {
-            "repo": "rj-nexus/velvet-aura",
-            "verified": true,
-            "featured": true,
-            "category": "general",
-            "tags": ["minimal", "shop", "e-commerce"]
-        }
-    ],
-    "plugins": [
-        {
-            "repo": "rj-nexus/rj-commerce",
-            "verified": true,
-            "featured": true,
-            "category": "ecommerce",
-            "tags": ["ecommerce", "shopping-cart", "products", "orders", "payments"]
-        }
-    ]
+  "$schema": "./schema/registry.schema.json",
+  "version": 1.0,
+  "updated_at": "2026-10-23T00:00:00Z",
+  "themes": [
+    {
+      "repo": "mr-ruhid/rj-theme-default",
+      "verified": true,
+      "featured": false,
+      "category": "general",
+      "tags": ["minimal", "blog"]
+    },
+    {
+      "repo": "rj-nexus/velvet-aura",
+      "verified": true,
+      "featured": true,
+      "category": "general",
+      "tags": ["minimal", "shop", "e-commerce"]
+    }
+  ],
+  "plugins": [
+    {
+      "repo": "rj-nexus/rj-commerce",
+      "verified": true,
+      "featured": true,
+      "category": "ecommerce",
+      "tags": ["ecommerce", "shopping-cart", "products", "orders", "payments"]
+    }
+  ]
 }
