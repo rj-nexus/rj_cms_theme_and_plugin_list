@@ -1,7 +1,7 @@
 {
-  "$schema": "./schema/registry.schema.json",
+  "$schema": "https://raw.githubusercontent.com/mr-ruhid/rj_cms_theme_and_plugin_list/main/schema/registry.schema.json",
   "version": "1.0",
-  "updated_at": "2026-11-04T02:12:00Z",
+  "updated_at": "2026-10-23T00:00:00Z",
   "themes": [
     {
       "repo": "mr-ruhid/rj-theme-default",
@@ -15,7 +15,7 @@
       "verified": true,
       "featured": true,
       "category": "general",
-      "tags": ["minimal", "shop", "e-commerce"]
+      "tags": ["minimal", "shop"]
     }
   ],
   "plugins": [
