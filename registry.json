@@ -9,9 +9,7 @@
             "featured": false,
             "category": "general",
             "tags": ["minimal", "blog"]
-        }
-    ],
-    "themes": [
+        },
         {
             "repo": "rj-nexus/velvet-aura",
             "verified": true,
