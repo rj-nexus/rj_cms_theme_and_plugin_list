@@ -4,165 +4,154 @@ on:
   pull_request:
     paths:
       - 'registry.json'
-      - 'schema/**'
-      - '.github/workflows/validate.yml'
+      - 'themes.json'
+      - 'plugins.json'
+      - 'schema/**.json'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'registry.json'
-      - 'schema/**'
-  workflow_dispatch:
+      - 'themes.json'
+      - 'plugins.json'
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  json-validate:
-    name: Validate JSON structure
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install ajv-cli
-        run: npm install -g ajv-cli ajv-formats
+      - name: Install ajv
+        run: npm install --no-save ajv@8 ajv-formats@2
 
-      - name: Check JSON syntax
+      - name: Validate JSON syntax
         run: |
-          if ! jq empty registry.json; then
-            echo "::error file=registry.json::registry.json is not valid JSON"
-            exit 1
-          fi
-          echo "✅ registry.json is valid JSON"
-
-      - name: Validate against schema
-        run: |
-          ajv validate \
-            -s schema/registry.schema.json \
-            -d registry.json \
-            --spec=draft7 \
-            -c ajv-formats \
-            --strict=false
-          echo "✅ registry.json matches schema"
-
-  check-duplicates:
-    name: Check duplicate entries
-    runs-on: ubuntu-latest
-    needs: json-validate
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Check duplicate theme repos
-        run: |
-          DUPLICATES=$(jq -r '.themes[].repo' registry.json | sort | uniq -d)
-          if [ -n "$DUPLICATES" ]; then
-            echo "::error file=registry.json::Duplicate theme entries: $DUPLICATES"
-            exit 1
-          fi
-          echo "✅ No duplicate themes"
-
-      - name: Check duplicate plugin repos
-        run: |
-          DUPLICATES=$(jq -r '.plugins[].repo' registry.json | sort | uniq -d)
-          if [ -n "$DUPLICATES" ]; then
-            echo "::error file=registry.json::Duplicate plugin entries: $DUPLICATES"
-            exit 1
-          fi
-          echo "✅ No duplicate plugins"
-
-  verify-repos:
-    name: Verify GitHub repositories
-    runs-on: ubuntu-latest
-    needs: json-validate
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Verify each repository exists and has releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          FAILED=0
-
-          ALL_REPOS=$(jq -r '.themes[].repo, .plugins[].repo' registry.json)
-
-          for REPO in $ALL_REPOS; do
-            echo "::group::Checking $REPO"
-
-            REPO_INFO=$(curl -s -o /dev/null -w "%{http_code}" \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO")
-
-            if [ "$REPO_INFO" != "200" ]; then
-              echo "::error::Repository not found or not public: $REPO (HTTP $REPO_INFO)"
-              FAILED=1
-              echo "::endgroup::"
-              continue
-            fi
-
-            echo "✅ Repository exists"
-
-            RELEASE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/releases/latest")
-
-            if [ "$RELEASE_STATUS" != "200" ]; then
-              echo "::error::No published release found for $REPO"
-              FAILED=1
-              echo "::endgroup::"
-              continue
-            fi
-
-            echo "✅ Has at least one release"
-
-            HAS_ZIP=$(curl -s \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/releases/latest" \
-              | jq '[.assets[] | select(.name | endswith(".zip"))] | length')
-
-            if [ "$HAS_ZIP" -eq 0 ]; then
-              echo "::error::Latest release of $REPO has no ZIP asset"
-              FAILED=1
-              echo "::endgroup::"
-              continue
-            fi
-
-            echo "✅ Release contains ZIP asset"
-            echo "::endgroup::"
+          for f in registry.json themes.json plugins.json schema/registry.schema.json schema/theme.schema.json schema/plugin.schema.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" || { echo "Invalid JSON: $f"; exit 1; }
+            echo "OK: $f"
           done
 
-          if [ "$FAILED" -eq 1 ]; then
-            echo "::error::One or more repositories failed validation"
-            exit 1
-          fi
-
-          echo "✅ All repositories verified"
-
-  summary:
-    name: Validation summary
-    runs-on: ubuntu-latest
-    needs: [json-validate, check-duplicates, verify-repos]
-    if: always()
-    steps:
-      - name: Print result
+      - name: Validate schemas
+        id: schema
         run: |
-          if [ "${{ needs.json-validate.result }}" != "success" ] || \
-             [ "${{ needs.check-duplicates.result }}" != "success" ] || \
-             [ "${{ needs.verify-repos.result }}" != "success" ]; then
-            echo "❌ Registry validation failed"
-            exit 1
-          fi
-          echo "✅ Registry validation passed"
+          node <<'EOF'
+          const fs = require('fs');
+          const Ajv = require('ajv');
+          const addFormats = require('ajv-formats');
+          const ajv = new Ajv({ allErrors: true, strict: false });
+          addFormats(ajv);
+
+          const load = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
+          const errors = [];
+
+          const regSchema = load('schema/registry.schema.json');
+          const themeSchema = load('schema/theme.schema.json');
+          const pluginSchema = load('schema/plugin.schema.json');
+
+          const regData = load('registry.json');
+          const themeData = load('themes.json');
+          const pluginData = load('plugins.json');
+
+          const validate = (schema, data, name) => {
+            const v = ajv.compile(schema);
+            if (!v(data)) {
+              for (const e of v.errors) {
+                errors.push(`${name}${e.instancePath || '/'} ${e.message}`);
+              }
+            }
+          };
+
+          validate(regSchema, regData, 'registry.json');
+          validate(themeSchema, themeData, 'themes.json');
+          validate(pluginSchema, pluginData, 'plugins.json');
+
+          if (regData.themes && regData.themes.count !== themeData.themes.length) {
+            errors.push(`registry.json themes.count (${regData.themes.count}) !== themes.json length (${themeData.themes.length})`);
+          }
+          if (regData.plugins && regData.plugins.count !== pluginData.plugins.length) {
+            errors.push(`registry.json plugins.count (${regData.plugins.count}) !== plugins.json length (${pluginData.plugins.length})`);
+          }
+
+          const seenThemes = new Set();
+          for (const t of themeData.themes) {
+            if (seenThemes.has(t.repo.toLowerCase())) errors.push(`Duplicate theme repo: ${t.repo}`);
+            seenThemes.add(t.repo.toLowerCase());
+          }
+          const seenPlugins = new Set();
+          for (const p of pluginData.plugins) {
+            if (seenPlugins.has(p.repo.toLowerCase())) errors.push(`Duplicate plugin repo: ${p.repo}`);
+            seenPlugins.add(p.repo.toLowerCase());
+          }
+
+          if (errors.length) {
+            console.error('Validation errors:');
+            errors.forEach(e => console.error(' - ' + e));
+            process.exit(1);
+          }
+          console.log('Schema validation passed.');
+          EOF
+
+      - name: Check remote repos and manifests
+        id: remote
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const themes = JSON.parse(fs.readFileSync('themes.json', 'utf8')).themes;
+            const plugins = JSON.parse(fs.readFileSync('plugins.json', 'utf8')).plugins;
+            const errors = [];
+            const check = async (entry, kind) => {
+              const [owner, repo] = entry.repo.split('/');
+              try {
+                await github.rest.repos.get({ owner, repo });
+              } catch (e) {
+                errors.push(`${kind} ${entry.repo}: repository not found or inaccessible`);
+                return;
+              }
+              const file = kind === 'theme' ? 'theme.json' : 'plugin.json';
+              let found = false;
+              for (const b of ['main', 'master']) {
+                try {
+                  const res = await github.rest.repos.getContent({ owner, repo, path: file, ref: b });
+                  const m = JSON.parse(Buffer.from(res.data.content, 'base64').toString('utf8'));
+                  if (!m.name) errors.push(`${kind} ${entry.repo}: manifest missing "name"`);
+                  if (!m.version) errors.push(`${kind} ${entry.repo}: manifest missing "version"`);
+                  if (m.name && entry.name && m.name.trim().toLowerCase() !== entry.name.trim().toLowerCase()) {
+                    errors.push(`${kind} ${entry.repo}: manifest name "${m.name}" !== registry name "${entry.name}"`);
+                  }
+                  found = true;
+                  break;
+                } catch (e) {
+                  if (e.status !== 404) errors.push(`${kind} ${entry.repo}: ${e.message}`);
+                }
+              }
+              if (!found) errors.push(`${kind} ${entry.repo}: ${file} not found at repo root`);
+            };
+            for (const t of themes) await check(t, 'theme');
+            for (const p of plugins) await check(p, 'plugin');
+            if (errors.length) {
+              core.setFailed(errors.join('\n'));
+            }
+            return errors;
+          result-encoding: string
+
+      - name: Comment on PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '**Registry validation failed.** Check the Actions log for details and update your submission.'
+            });
