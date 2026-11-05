@@ -1,4 +1,71 @@
 {
   "$schema": "https://raw.githubusercontent.com/rj-nexus/rj_cms_theme_and_plugin_list/main/schema/theme.schema.json",
-  "themes": [ ... ]
+  "themes": [
+    {
+      "repo": "mr-ruhid/rj-theme-default",
+      "name": "RJ Default",
+      "author": "mr-ruhid",
+      "version": "1.0.0",
+      "verified": true,
+      "featured": false,
+      "category": "general",
+      "tags": ["minimal", "blog"],
+      "logo": "",
+      "screenshots": [],
+      "details": {
+        "description": "The default RJ Nexus theme. Clean, minimal and fast, built for blogs and content sites.",
+        "features": [
+          "Minimal and clean design",
+          "Fully responsive",
+          "RJBuilder ready",
+          "Optimized for performance"
+        ]
+      },
+      "installation": {
+        "steps": [
+          "Download the ZIP from the releases page",
+          "Go to Admin → Appearance → Themes",
+          "Upload the ZIP file",
+          "Click Activate"
+        ]
+      },
+      "development": {
+        "requires": "RJ Nexus >= 1.8.0",
+        "docs": "https://github.com/mr-ruhid/rj-theme-default#readme"
+      }
+    },
+    {
+      "repo": "rj-nexus/velvet-aura",
+      "name": "Velvet Aura",
+      "author": "rj-nexus",
+      "version": "1.7.0",
+      "verified": true,
+      "featured": true,
+      "category": "general",
+      "tags": ["minimal", "shop"],
+      "logo": "",
+      "screenshots": [],
+      "details": {
+        "description": "A premium theme with elegant typography, custom widgets and full RJBuilder support.",
+        "features": [
+          "Premium widget collection",
+          "Custom color presets",
+          "Full builder integration",
+          "Optimized for commerce"
+        ]
+      },
+      "installation": {
+        "steps": [
+          "Download the ZIP from the releases page",
+          "Go to Admin → Appearance → Themes",
+          "Upload the ZIP file",
+          "Click Activate"
+        ]
+      },
+      "development": {
+        "requires": "RJ Nexus >= 1.8.0",
+        "docs": "https://github.com/rj-nexus/velvet-aura#readme"
+      }
+    }
+  ]
 }
