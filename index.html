@@ -9,7 +9,7 @@
 :root{
 --bg:#05040f;--card:#0f0d1f;--card2:#161226;--border:#2d1754;
 --fg:#e5e7eb;--muted:#9ca3af;--accent:#a855f7;--accent2:#ec4899;
---err:#fb7185;
+--err:#fb7185;--ok:#6ee7b7;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;padding:32px 16px}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 75% 25%,#1c1450 0%,#0d0a2b 50%,#05040f 100%)}
@@ -38,7 +38,16 @@ input.invalid,textarea.invalid{border-color:var(--err)}
 button{width:100%;padding:14px 24px;border:0;border-radius:999px;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.03em;cursor:pointer;animation:flow-bg 6s linear infinite;transition:transform .2s,box-shadow .2s;font-family:inherit}
 button:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(236,72,153,.7)}
 button:active{transform:scale(.98)}
+button:disabled{opacity:.65;cursor:wait;animation:none;background:linear-gradient(110deg,#4c1d95,#831843)}
+button:disabled::after{content:"";display:inline-block;width:14px;height:14px;margin-left:10px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes flow-bg{to{background-position:-300% 0}}
+.status{margin-top:20px;padding:16px 18px;border-radius:12px;font-size:14px;display:none;word-break:break-word}
+.status.show{display:block}
+.status.ok{background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.4);color:#a7f3d0}
+.status.error{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.4);color:#fda4af}
+.status a{color:inherit;text-decoration:underline}
+.status ul{margin:8px 0 0 20px}
 .note{margin-top:20px;font-size:13px;color:var(--muted);text-align:center}
 .note a{color:var(--accent);text-decoration:none}
 .note a:hover{text-decoration:underline}
@@ -48,9 +57,9 @@ button:active{transform:scale(.98)}
 <body>
 <main>
 <h1>Submit Theme or Plugin</h1>
-<p class="sub">RJ Nexus registry accepts themes and plugins from the community. Fill the form, then confirm on GitHub.</p>
+<p class="sub">RJ Nexus registry accepts themes and plugins from the community. Fill the form and submit — no GitHub account required.</p>
 <div class="flow">
-<span>Fill form</span><span>Confirm on GitHub</span><span>Auto PR</span><span>CI check</span><span>Review</span><span>Merged</span>
+<span>Fill form</span><span>Submit</span><span>Auto PR</span><span>CI check</span><span>Review</span><span>Merged</span>
 </div>
 <form id="form" novalidate>
 
@@ -59,7 +68,7 @@ button:active{transform:scale(.98)}
 
 <label for="repo">Repository (owner/repo)</label>
 <input id="repo" name="repo" placeholder="mr-ruhid/rj-theme-default" autocomplete="off" spellcheck="false" required>
-<div class="hint">GitHub repository with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
+<div class="hint">Public GitHub repository with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
 <div class="err" id="err-repo">Repository must match format: owner/repo</div>
 
 <div class="row">
@@ -117,7 +126,7 @@ button:active{transform:scale(.98)}
 
 <label for="logo">Logo URL (optional)</label>
 <input id="logo" name="logo" placeholder="https://example.com/logo.png" autocomplete="off">
-<div class="hint">Direct image URL. Need hosting? Use <a href="https://freeimage.host" target="_blank" rel="noopener">freeimage.host</a> or <a href="https://imgbb.com" target="_blank" rel="noopener">imgbb.com</a> — no account required.</div>
+<div class="hint">Direct image URL. No account needed: <a href="https://freeimage.host" target="_blank" rel="noopener">freeimage.host</a>, <a href="https://imgbb.com" target="_blank" rel="noopener">imgbb.com</a>.</div>
 <div class="err" id="err-logo">Must be a valid https URL</div>
 
 <label for="screenshots">Screenshots (one URL per line, max 8, optional)</label>
@@ -156,15 +165,17 @@ button:active{transform:scale(.98)}
 <div class="err" id="err-docs">Must be a valid https URL</div>
 </fieldset>
 
-<button type="submit">Continue on GitHub</button>
+<button type="submit" id="submit-btn">Submit to Registry</button>
+<div class="status" id="status"></div>
 </form>
-<p class="note">You will be redirected to a prefilled GitHub issue. A bot opens a Pull Request automatically. <a href="https://github.com/rj-nexus/rj_cms_theme_and_plugin_list" target="_blank" rel="noopener">View repository</a></p>
+<p class="note">A bot validates your submission and opens a Pull Request. Maintainers review and merge. <a href="https://github.com/rj-nexus/rj-registration" target="_blank" rel="noopener">View repository</a></p>
 </main>
 <script>
 (function(){
-var OWNER="rj-nexus";
-var NAME="rj_cms_theme_and_plugin_list";
+var WORKER_URL = "https://REPLACE-WITH-YOUR-WORKER.workers.dev/submit";
 var form=document.getElementById("form");
+var btn=document.getElementById("submit-btn");
+var status=document.getElementById("status");
 
 var el=function(id){return document.getElementById(id)};
 var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
@@ -179,7 +190,6 @@ function mark(id,ok){
 var f=el(id);
 if(f)f.classList.toggle("invalid",!ok);
 }
-
 function cleanLines(v,max){
 return v.split(/\r?\n/).map(function(s){return s.trim()}).filter(Boolean).slice(0,max||999);
 }
@@ -189,6 +199,11 @@ return v.split(",").map(function(t){return t.trim().toLowerCase()})
 .filter(function(x){return /^[a-z0-9-]+$/.test(x)})
 .filter(function(x,i,a){return a.indexOf(x)===i})
 .slice(0,8);
+}
+
+function setStatus(kind,html){
+status.className="status show "+kind;
+status.innerHTML=html;
 }
 
 el("repo").addEventListener("input",function(){
@@ -217,6 +232,7 @@ mark("docs",ok);showErr("docs",!ok&&v.length>0);
 
 form.addEventListener("submit",function(e){
 e.preventDefault();
+status.className="status";
 var errors=[];
 
 var repo=el("repo").value.trim();
@@ -256,45 +272,60 @@ if(first)first.scrollIntoView({behavior:"smooth",block:"center"});
 return;
 }
 
-var type=el("type").value;
-var category=el("category").value;
-var tags=cleanTags(el("tags").value);
+var payload={
+repo:repo,
+type:el("type").value,
+category:el("category").value,
+name:name,
+version:version,
+author:author,
+tags:cleanTags(el("tags").value),
+logo:logo,
+screenshots:screenshots,
+description:description,
+features:features,
+steps:steps,
+requires:requires,
+docs:docs
+};
 
-var title="[Registry] Add "+type+": "+repo;
+btn.disabled=true;
+btn.textContent="Submitting";
+setStatus("ok","Sending your submission...");
 
-var body=[
-"### Repo","`"+repo+"`","",
-"### Type",type,"",
-"### Category",category,"",
-"### Name",name,"",
-"### Version",version,"",
-"### Author",author,"",
-"### Tags",tags.length?tags.join(", "):"(none)","",
-"### Logo",logo||"(none)","",
-"### Screenshots",
-screenshots.length?screenshots.join("\n"):"(none)","",
-"### Description",description,"",
-"### Features",
-features.length?features.map(function(f){return "- "+f}).join("\n"):"(none)","",
-"### Installation Steps",
-steps.map(function(s){return "1. "+s}).join("\n"),"",
-"### Requires",requires,"",
-"### Docs",docs,"",
-"---",
-"_Submitted via the registry form._"
-].join("\n");
-
-if(body.length>6000){
-alert("Your submission is too long. Please shorten the description, features or steps.");
-return;
+fetch(WORKER_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+})
+.then(function(res){
+return res.json().then(function(body){return {ok:res.ok,status:res.status,body:body}});
+})
+.then(function(r){
+if(r.ok&&r.body.success){
+setStatus("ok",
+"<strong>Submission received.</strong><br>"+
+"A Pull Request is being created by the registry bot. "+
+"You can follow the review at "+
+'<a href="https://github.com/rj-nexus/rj-registration/pulls" target="_blank" rel="noopener">the pull requests page</a>.'
+);
+form.reset();
+btn.disabled=false;
+btn.textContent="Submit another";
+btn.addEventListener("click",function(){btn.textContent="Submit to Registry"},{once:true});
+}else{
+var msg=r.body&&(r.body.error||r.body.details)?(r.body.error||r.body.details):("HTTP "+r.status);
+var fields=r.body&&r.body.fields?"<ul><li>"+r.body.fields.join("</li><li>")+"</li></ul>":"";
+setStatus("error","<strong>Submission failed.</strong><br>"+msg+fields);
+btn.disabled=false;
+btn.textContent="Try again";
 }
-
-var url="https://github.com/"+OWNER+"/"+NAME+"/issues/new"
-+"?title="+encodeURIComponent(title)
-+"&body="+encodeURIComponent(body)
-+"&labels=registry-submission";
-
-window.open(url,"_blank","noopener");
+})
+.catch(function(e){
+setStatus("error","<strong>Network error.</strong><br>"+e.message);
+btn.disabled=false;
+btn.textContent="Try again";
+});
 });
 })();
 </script>
