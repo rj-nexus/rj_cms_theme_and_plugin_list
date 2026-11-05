@@ -1,109 +1,15 @@
 {
-  "$schema": "https://raw.githubusercontent.com/mr-ruhid/rj_cms_theme_and_plugin_list/main/schema/registry.schema.json",
+  "$schema": "https://raw.githubusercontent.com/rj-nexus/rj_cms_theme_and_plugin_list/main/schema/registry.schema.json",
   "version": "1.1",
   "updated_at": "2026-11-05T00:00:00Z",
-  "themes": [
-    {
-      "repo": "mr-ruhid/rj-theme-default",
-      "name": "RJ Default",
-      "author": "mr-ruhid",
-      "version": "1.0.0",
-      "verified": true,
-      "featured": false,
-      "category": "general",
-      "tags": ["minimal", "blog"],
-      "logo": "",
-      "screenshots": [],
-      "details": {
-        "description": "The default RJ Nexus theme. Clean, minimal and fast, built for blogs and content sites.",
-        "features": [
-          "Minimal and clean design",
-          "Fully responsive",
-          "RJBuilder ready",
-          "Optimized for performance"
-        ]
-      },
-      "installation": {
-        "steps": [
-          "Download the ZIP from the releases page",
-          "Go to Admin → Appearance → Themes",
-          "Upload the ZIP file",
-          "Click Activate"
-        ]
-      },
-      "development": {
-        "requires": "RJ Nexus >= 1.8.0",
-        "docs": "https://github.com/mr-ruhid/rj-theme-default#readme"
-      }
-    },
-    {
-      "repo": "rj-nexus/velvet-aura",
-      "name": "Velvet Aura",
-      "author": "rj-nexus",
-      "version": "1.7.0",
-      "verified": true,
-      "featured": true,
-      "category": "general",
-      "tags": ["minimal", "shop"],
-      "logo": "",
-      "screenshots": [],
-      "details": {
-        "description": "A premium theme with elegant typography, custom widgets and full RJBuilder support.",
-        "features": [
-          "Premium widget collection",
-          "Custom color presets",
-          "Full builder integration",
-          "Optimized for commerce"
-        ]
-      },
-      "installation": {
-        "steps": [
-          "Download the ZIP from the releases page",
-          "Go to Admin → Appearance → Themes",
-          "Upload the ZIP file",
-          "Click Activate"
-        ]
-      },
-      "development": {
-        "requires": "RJ Nexus >= 1.8.0",
-        "docs": "https://github.com/rj-nexus/velvet-aura#readme"
-      }
-    }
-  ],
-  "plugins": [
-    {
-      "repo": "rj-nexus/rj-commerce",
-      "name": "RJ Commerce",
-      "author": "rj-nexus",
-      "version": "1.0.0",
-      "verified": true,
-      "featured": true,
-      "category": "ecommerce",
-      "tags": ["ecommerce", "shopping-cart", "products", "orders", "payments"],
-      "logo": "",
-      "screenshots": [],
-      "details": {
-        "description": "Full e-commerce plugin for RJ Nexus. Products, cart, orders, payments and more.",
-        "features": [
-          "Product management",
-          "Shopping cart",
-          "Order tracking",
-          "Multiple payment gateways",
-          "Inventory management"
-        ]
-      },
-      "installation": {
-        "steps": [
-          "Download the ZIP from the releases page",
-          "Go to Admin → Plugins → Upload Plugin",
-          "Select the ZIP and click Upload",
-          "Click Activate next to the plugin"
-        ]
-      },
-      "development": {
-        "requires": "RJ Nexus >= 1.8.0, PHP >= 8.2",
-        "docs": "https://github.com/rj-nexus/rj-commerce#readme"
-      }
-    }
-  ]
+  "themes": {
+    "url": "https://raw.githubusercontent.com/rj-nexus/rj_cms_theme_and_plugin_list/main/themes.json",
+    "count": 2,
+    "updated_at": "2026-11-05T00:00:00Z"
+  },
+  "plugins": {
+    "url": "https://raw.githubusercontent.com/rj-nexus/rj_cms_theme_and_plugin_list/main/plugins.json",
+    "count": 1,
+    "updated_at": "2026-11-05T00:00:00Z"
+  }
 }
