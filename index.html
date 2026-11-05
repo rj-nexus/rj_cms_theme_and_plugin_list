@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RJ Nexus — Registry Submission</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#05040f;--card:#0f0d1f;--card2:#161226;--border:#2d1754;
+--fg:#e5e7eb;--muted:#9ca3af;--accent:#a855f7;--accent2:#ec4899;
+--err:#fb7185;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;padding:32px 16px}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 75% 25%,#1c1450 0%,#0d0a2b 50%,#05040f 100%)}
+main{position:relative;z-index:1;max-width:640px;margin:0 auto}
+h1{font-size:28px;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#fff,#e9d5ff,#f9a8d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);margin-bottom:24px;font-size:14px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;font-size:12px;color:var(--muted);align-items:center}
+.flow span{padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:999px}
+.flow span+i::before{content:"→ ";margin-left:-6px;margin-right:2px;color:var(--accent)}
+form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+input,select,textarea{width:100%;background:var(--card2);border:1.5px solid var(--border);color:var(--fg);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:14.5px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:18px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(168,85,247,.16)}
+textarea{min-height:96px;resize:vertical}
+input.invalid{border-color:var(--err)}
+.hint{font-size:12px;color:var(--muted);margin:-12px 0 18px}
+.hint code{background:var(--card2);padding:2px 6px;border-radius:4px;font-size:11.5px;color:var(--accent)}
+.err{color:var(--err);font-size:12px;margin:-12px 0 12px;display:none}
+.err.show{display:block}
+button{width:100%;padding:14px 24px;border:0;border-radius:999px;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.03em;cursor:pointer;animation:flow-bg 6s linear infinite;transition:transform .2s,box-shadow .2s;font-family:inherit}
+button:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(236,72,153,.7)}
+button:active{transform:scale(.98)}
+@keyframes flow-bg{to{background-position:-300% 0}}
+.note{margin-top:20px;font-size:13px;color:var(--muted);text-align:center}
+.note a{color:var(--accent);text-decoration:none}
+.note a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<main>
+<h1>Submit Theme or Plugin</h1>
+<p class="sub">RJ Nexus registry accepts themes and plugins from the community. Fill the form, then confirm on GitHub.</p>
+<div class="flow">
+<span>Fill form</span><span>Confirm on GitHub</span><span>Auto PR</span><span>CI check</span><span>Review</span><span>Merged</span>
+</div>
+<form id="form" novalidate>
+<label for="repo">Repository (owner/repo)</label>
+<input id="repo" name="repo" placeholder="mr-ruhid/rj-theme-default" autocomplete="off" spellcheck="false" required>
+<div class="hint">GitHub repository with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
+<div class="err" id="err-repo">Repository must match format: owner/repo</div>
+
+<label for="type">Type</label>
+<select id="type" name="type">
+<option value="theme">Theme</option>
+<option value="plugin">Plugin</option>
+</select>
+
+<label for="category">Category</label>
+<select id="category" name="category">
+<option value="general">General</option>
+<option value="blog">Blog</option>
+<option value="portfolio">Portfolio</option>
+<option value="business">Business</option>
+<option value="ecommerce">E-commerce</option>
+<option value="landing">Landing</option>
+<option value="agency">Agency</option>
+<option value="other">Other</option>
+</select>
+
+<label for="tags">Tags (comma separated)</label>
+<input id="tags" name="tags" placeholder="minimal, blog, dark" autocomplete="off">
+
+<label for="description">Short Description</label>
+<textarea id="description" name="description" placeholder="One or two sentences about what makes it useful." maxlength="300"></textarea>
+
+<button type="submit">Continue on GitHub</button>
+</form>
+<p class="note">You will be redirected to a prefilled GitHub issue. A bot opens a Pull Request automatically. <a href="https://github.com/rj-nexus/rj_cms_theme_and_plugin_list" target="_blank" rel="noopener">View repository</a></p>
+</main>
+<script>
+(function(){
+var OWNER="rj-nexus";
+var NAME="rj_cms_theme_and_plugin_list";
+var form=document.getElementById("form");
+var repoInput=document.getElementById("repo");
+var errRepo=document.getElementById("err-repo");
+var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+
+repoInput.addEventListener("input",function(){
+if(repoRe.test(repoInput.value.trim())){
+repoInput.classList.remove("invalid");
+errRepo.classList.remove("show");
+}
+});
+
+form.addEventListener("submit",function(e){
+e.preventDefault();
+var repo=repoInput.value.trim();
+
+if(!repoRe.test(repo)){
+repoInput.classList.add("invalid");
+errRepo.classList.add("show");
+repoInput.focus();
+return;
+}
+
+var type=document.getElementById("type").value;
+var category=document.getElementById("category").value;
+var tagsRaw=document.getElementById("tags").value.trim();
+var description=document.getElementById("description").value.trim();
+
+var tags=tagsRaw.split(",")
+.map(function(t){return t.trim().toLowerCase()})
+.filter(Boolean)
+.filter(function(v,i,a){return a.indexOf(v)===i})
+.slice(0,8);
+
+var title="[Registry] Add "+type+": "+repo;
+
+var body=[
+"### Repo",
+repo,
+"",
+"### Type",
+type,
+"",
+"### Category",
+category,
+"",
+"### Tags",
+tags.length?tags.join(", "):"(none)",
+"",
+"### Description",
+description||"(none)",
+"",
+"---",
+"_Submitted via the registry form._"
+].join("\n");
+
+var url="https://github.com/"+OWNER+"/"+NAME+"/issues/new"
++"?title="+encodeURIComponent(title)
++"&body="+encodeURIComponent(body)
++"&labels=registry-submission";
+
+window.open(url,"_blank","noopener");
+});
+})();
+</script>
+</body>
+</html>
