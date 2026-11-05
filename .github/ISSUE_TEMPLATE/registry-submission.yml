@@ -1,0 +1,168 @@
+name: Registry Submission
+description: Submit a theme or plugin to the RJ Nexus registry
+title: "[Registry] Add theme: owner/repo"
+labels: ["registry-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting to the RJ Nexus registry. Fill in every field below. A bot will validate your submission and open a Pull Request automatically.
+
+        Prefer a visual form? Use https://rj-nexus.github.io/rj-registration/ instead.
+
+  - type: input
+    id: repo
+    attributes:
+      label: Repository
+      description: GitHub repository in owner/repo format.
+      placeholder: mr-ruhid/rj-theme-default
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - theme
+        - plugin
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - general
+        - blog
+        - portfolio
+        - business
+        - ecommerce
+        - landing
+        - agency
+        - forms
+        - seo
+        - marketing
+        - analytics
+        - security
+        - media
+        - social
+        - developer
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Display Name
+      placeholder: RJ Default
+      description: Must match the "name" field in your theme.json or plugin.json.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 1.0.0
+      description: Semantic version, e.g. 1.0.0 or 1.0.0-beta.
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: Author
+      placeholder: mr-ruhid
+      description: GitHub username of the author.
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      placeholder: minimal, blog, dark
+      description: Comma separated, max 8, lowercase, hyphens allowed.
+
+  - type: input
+    id: logo
+    attributes:
+      label: Logo URL
+      placeholder: https://example.com/logo.png
+      description: Direct https image URL. Leave empty if none.
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      placeholder: |
+        https://example.com/shot1.png
+        https://example.com/shot2.png
+      description: One https URL per line, max 8. Leave empty if none.
+      render: text
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: One or two sentences about what makes it useful.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: features
+    attributes:
+      label: Features
+      placeholder: |
+        Minimal and clean design
+        Fully responsive
+        RJBuilder ready
+      description: One per line, max 12.
+      render: text
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Installation Steps
+      placeholder: |
+        Download the ZIP from the releases page
+        Go to Admin → Appearance → Themes
+        Upload the ZIP file
+        Click Activate
+      description: One per line, max 15.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: requires
+    attributes:
+      label: Requirements
+      placeholder: RJ Nexus >= 1.8.0, PHP >= 8.2
+    validations:
+      required: true
+
+  - type: input
+    id: docs
+    attributes:
+      label: Documentation URL
+      placeholder: https://github.com/owner/repo#readme
+      description: Must be an https URL.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: I confirm the repository is public and contains a valid theme.json or plugin.json at its root.
+          required: true
+        - label: I confirm the manifest name matches the Display Name above.
+          required: true
+        - label: I confirm this submission contains no malicious code.
+          required: true
