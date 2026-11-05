@@ -45,9 +45,9 @@ jobs:
         run: |
           node <<'EOF'
           const fs = require('fs');
-          const Ajv = require('ajv');
+          const Ajv2020 = require('ajv/dist/2020').default;
           const addFormats = require('ajv-formats');
-          const ajv = new Ajv({ allErrors: true, strict: false });
+          const ajv = new Ajv2020({ allErrors: true, strict: false, validateSchema: false });
           addFormats(ajv);
 
           const load = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -141,8 +141,6 @@ jobs:
             if (errors.length) {
               core.setFailed(errors.join('\n'));
             }
-            return errors;
-          result-encoding: string
 
       - name: Comment on PR
         if: failure() && github.event_name == 'pull_request'
