@@ -6,422 +6,410 @@
 <title>RJ Nexus — Registry Submission</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
---bg:#05040f;--card:#0f0d1f;--card2:#161226;--border:#2d1754;
---fg:#e5e7eb;--muted:#9ca3af;--accent:#a855f7;--accent2:#ec4899;
---err:#fb7185;--ok:#6ee7b7;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;padding:32px 16px;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 75% 25%,#1c1450 0%,#0d0a2b 50%,#05040f 100%)}
-main{position:relative;z-index:1;max-width:680px;margin:0 auto}
-h1{font-size:28px;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#fff,#e9d5ff,#f9a8d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.sub{color:var(--muted);margin-bottom:24px;font-size:14px}
-.flow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;font-size:12px;color:var(--muted);align-items:center}
-.flow span{padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:999px}
-.flow span+i::before{content:"→ ";margin-left:-6px;margin-right:2px;color:var(--accent)}
-form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
-fieldset{border:0;padding:0;margin:0 0 20px}
-legend{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);width:100%}
-label{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-input,select,textarea{width:100%;background:var(--card2);border:1.5px solid var(--border);color:var(--fg);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:14.5px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:18px}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(168,85,247,.16)}
-textarea{min-height:88px;resize:vertical}
-input.invalid,textarea.invalid{border-color:var(--err)}
-.hint{font-size:12px;color:var(--muted);margin:-12px 0 18px}
-.hint code{background:var(--card2);padding:2px 6px;border-radius:4px;font-size:11.5px;color:var(--accent)}
-.hint a{color:var(--accent);text-decoration:none}
-.hint a:hover{text-decoration:underline}
-.err{color:var(--err);font-size:12px;margin:-12px 0 12px;display:none}
-.err.show{display:block}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row input,.row select{margin-bottom:18px}
-button{width:100%;padding:14px 24px;border:0;border-radius:999px;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.03em;cursor:pointer;animation:flow-bg 6s linear infinite;transition:transform .2s,box-shadow .2s;font-family:inherit}
-button:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(236,72,153,.7)}
-button:active{transform:scale(.98)}
-button:disabled{opacity:.65;cursor:wait;animation:none;background:linear-gradient(110deg,#4c1d95,#831843)}
-button:disabled::after{content:"";display:inline-block;width:14px;height:14px;margin-left:10px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes flow-bg{to{background-position:-300% 0}}
-.status{margin-top:20px;padding:16px 18px;border-radius:12px;font-size:14px;display:none;word-break:break-word}
-.status.show{display:block}
-.status.error{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.4);color:#fda4af}
-.status a{color:inherit;text-decoration:underline}
-.status ul{margin:8px 0 0 20px}
-.note{margin-top:20px;font-size:13px;color:var(--muted);text-align:center}
-.note a{color:var(--accent);text-decoration:none}
-.note a:hover{text-decoration:underline}
-@media (max-width:520px){.row{grid-template-columns:1fr}}
-
-.success-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,4,15,.86);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .45s ease}
-.success-overlay.show{opacity:1;pointer-events:auto}
-.success-card{position:relative;max-width:440px;width:100%;background:linear-gradient(160deg,#0f0d1f,#161226);border:1px solid rgba(168,85,247,.35);border-radius:24px;padding:44px 32px 32px;text-align:center;box-shadow:0 40px 80px -30px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04) inset,0 0 80px -20px rgba(168,85,247,.5);transform:scale(.88) translateY(20px);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.3),opacity .55s ease}
-.success-overlay.show .success-card{transform:scale(1) translateY(0);opacity:1}
-.success-card::before{content:"";position:absolute;inset:-2px;border-radius:26px;background:linear-gradient(135deg,rgba(124,58,237,.5),rgba(236,72,153,.5),rgba(245,158,11,.4));z-index:-1;filter:blur(20px);opacity:.6;animation:pulse-glow 3s ease-in-out infinite alternate}
-@keyframes pulse-glow{from{opacity:.35}to{opacity:.75}}
-
-.check-circle{width:96px;height:96px;margin:0 auto 24px;position:relative}
-.check-circle svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 24px rgba(110,231,183,.4))}
-.check-circle circle{fill:none;stroke:url(#grad-ok);stroke-width:4;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;animation:draw-circle .7s cubic-bezier(.65,0,.45,1) .1s forwards}
-.check-circle path{fill:none;stroke:#6ee7b7;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw-check .45s cubic-bezier(.65,0,.45,1) .7s forwards}
-@keyframes draw-circle{to{stroke-dashoffset:0}}
-@keyframes draw-check{to{stroke-dashoffset:0}}
-
-.success-card h2{font-size:22px;font-weight:800;margin-bottom:10px;background:linear-gradient(90deg,#fff,#a7f3d0,#6ee7b7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:fade-up .5s ease .9s forwards}
-.success-card p{font-size:14.5px;color:var(--muted);margin-bottom:24px;opacity:0;animation:fade-up .5s ease 1s forwards}
-.success-card p a{color:var(--accent);text-decoration:none}
-.success-card p a:hover{text-decoration:underline}
-.success-actions{display:flex;gap:10px;flex-direction:column;opacity:0;animation:fade-up .5s ease 1.1s forwards}
-@keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.btn-ghost{display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--fg);font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;font-family:inherit;transition:border-color .2s,color .2s,transform .2s}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
-.btn-primary{display:inline-flex;align-items:center;justify-content:center;padding:13px 24px;border-radius:999px;border:0;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font-weight:800;font-size:14.5px;cursor:pointer;text-decoration:none;font-family:inherit;animation:flow-bg 6s linear infinite;box-shadow:0 12px 30px -14px rgba(236,72,153,.8);transition:transform .2s}
-.btn-primary:hover{transform:translateY(-1px)}
-
-.confetti{position:fixed;inset:0;pointer-events:none;z-index:10000;overflow:hidden}
-.confetti i{position:absolute;width:10px;height:10px;top:-20px;opacity:0;animation:drop linear forwards}
-@keyframes drop{
-0%{opacity:1;transform:translateY(-20px) rotate(0deg)}
-85%{opacity:1}
-100%{opacity:0;transform:translateY(110vh) rotate(720deg)}
-}
+:root{--bg:#05040f;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.1);--fg:#e5e7eb;--muted:#9ca3af;--a:#a855f7;--b:#ec4899;--c:#f59e0b;--err:#fb7185;--ok:#6ee7b7}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;padding:40px 16px 56px;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(120% 90% at 75% 20%,#1c1450 0%,#0d0a2b 50%,#05040f 100%)}
+.bg i{position:absolute;border-radius:50%}
+.b1,.b2{width:min(520px,70vw);aspect-ratio:1;filter:blur(40px)}
+.b1{top:-8%;left:-6%;background:radial-gradient(circle,rgba(168,85,247,.35),transparent 65%);animation:d1 18s ease-in-out infinite alternate}
+.b2{bottom:-10%;right:-8%;background:radial-gradient(circle,rgba(236,72,153,.28),transparent 65%);animation:d2 22s ease-in-out infinite alternate}
+.grid{inset:0;border-radius:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000 10%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000 10%,transparent 75%)}
+@keyframes d1{to{transform:translate(90px,60px) scale(1.15)}}
+@keyframes d2{to{transform:translate(-80px,-50px) scale(1.1)}}
+.bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:50;background:rgba(255,255,255,.05)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b),var(--c));box-shadow:0 0 14px rgba(236,72,153,.7);transition:width .4s cubic-bezier(.2,.7,.2,1)}
+main{position:relative;z-index:1;max-width:1080px;margin:0 auto}
+.hero{text-align:center;margin-bottom:36px}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:6px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font:600 11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#d8b4fe;backdrop-filter:blur(12px)}
+.pill b{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pu 2s ease-in-out infinite}
+@keyframes pu{50%{opacity:.35;transform:scale(.7)}}
+h1{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:18px 0 12px;background:linear-gradient(100deg,#fff 20%,#e9d5ff 40%,#f9a8d4 55%,#fcd34d 70%,#fff 90%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sh 9s ease-in-out infinite alternate}
+@keyframes sh{to{background-position:100% 50%}}
+.sub{color:var(--muted);font-size:15px;max-width:560px;margin:0 auto 26px}
+.flow{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:8px 0;font-size:12px;color:var(--muted)}
+.flow li{position:relative;display:flex;align-items:center;gap:8px;padding:0 12px;animation:lit 6s linear infinite;animation-delay:calc(var(--n)*1s)}
+.flow li::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.6}
+.flow li:not(:last-child)::after{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+@keyframes lit{0%,16%{color:#fff;text-shadow:0 0 12px rgba(236,72,153,.8)}17%,100%{color:var(--muted);text-shadow:none}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+form{counter-reset:s;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:24px;padding:28px;backdrop-filter:blur(22px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -30px rgba(0,0,0,.6)}
+fieldset{border:0;margin:0 0 26px}
+legend{counter-increment:s;display:flex;align-items:center;gap:10px;width:100%;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#d8b4fe;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+legend::before{content:counter(s);display:grid;place-items:center;width:22px;height:22px;border-radius:8px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-size:11px;letter-spacing:0}
+label,.lab{display:block;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+input,textarea{width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line);color:var(--fg);border-radius:12px;padding:12px 14px;font:inherit;font-size:14.5px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+input:hover,textarea:hover{border-color:rgba(255,255,255,.2)}
+input:focus,textarea:focus,.tags:focus-within{border-color:var(--a);box-shadow:0 0 0 4px rgba(168,85,247,.16);background:rgba(0,0,0,.4)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.26)}
+textarea{min-height:84px;resize:vertical}
+[aria-invalid=true]{border-color:var(--err)!important}
+.f{margin-bottom:16px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.hint code{background:rgba(255,255,255,.07);padding:1px 6px;border-radius:5px;font-size:11.5px;color:#d8b4fe}
+.hint a{color:#d8b4fe;text-decoration:none}.hint a:hover{text-decoration:underline}
+.err{color:var(--err);font-size:12px;margin-top:6px;min-height:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--line)}
+.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 6px 18px -6px rgba(236,72,153,.7);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.seg[data-v=plugin] i{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;background:none;border:0;color:var(--muted);font:700 14px inherit;padding:9px;cursor:pointer;transition:color .3s;border-radius:10px}
+.seg button[aria-checked=true]{color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 13px;font:600 12.5px inherit;cursor:pointer;transition:all .25s;animation:pop .35s cubic-bezier(.2,1.4,.4,1) backwards}
+.chip:hover{color:#fff;border-color:rgba(168,85,247,.6)}
+.chip[aria-checked=true]{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 6px 16px -6px rgba(236,72,153,.7)}
+@keyframes pop{from{opacity:0;transform:scale(.8)}}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:12px;transition:all .2s}
+.tags input{flex:1;min-width:110px;border:0;background:none;padding:5px 6px;box-shadow:none!important}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 11px;border-radius:999px;background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.35);color:#e9d5ff;font-size:12.5px;animation:pop .3s cubic-bezier(.2,1.4,.4,1)}
+.tag button{background:none;border:0;color:inherit;width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1}
+.tag button:hover{background:rgba(255,255,255,.15)}
+.cnt{float:right;font-weight:500;letter-spacing:0;text-transform:none}
+.go{position:relative;overflow:hidden;width:100%;padding:15px 24px;border:0;border-radius:999px;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font:800 15px inherit;letter-spacing:.03em;cursor:pointer;animation:fl 6s linear infinite;transition:transform .2s,box-shadow .2s}
+.go::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-12deg);transition:left .8s}
+.go:hover{transform:translateY(-2px);box-shadow:0 14px 34px -10px rgba(236,72,153,.75)}.go:hover::after{left:130%}
+.go:active{transform:scale(.98)}
+.go:disabled{opacity:.7;cursor:wait;animation:none;background:linear-gradient(110deg,#4c1d95,#831843)}
+.go:disabled::before{content:"";display:inline-block;width:14px;height:14px;margin-right:10px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fl{to{background-position:-300% 0}}
+.status{display:none;margin-top:18px;padding:14px 16px;border-radius:14px;font-size:14px;word-break:break-word;background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.4);color:#fda4af}
+.status.show{display:block}.status ul{margin:8px 0 0 20px}
+.preview{position:sticky;top:24px}
+.pc{border-radius:22px;padding:20px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid var(--line);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -30px rgba(0,0,0,.6);position:relative;overflow:hidden}
+.pc::before{content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(236,72,153,.3),transparent 65%);animation:pu 5s ease-in-out infinite}
+.pl{font:600 10.5px ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.ph{display:flex;gap:14px;align-items:center;position:relative}
+.pg{width:56px;height:56px;border-radius:16px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;font-weight:800;font-size:22px;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 24px -10px rgba(236,72,153,.8)}
+.pg img{width:100%;height:100%;object-fit:cover}
+.pn{font-weight:700;font-size:17px;letter-spacing:-.01em;line-height:1.25;overflow-wrap:anywhere}
+.pm{font-size:12.5px;color:var(--muted)}
+.pb{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
+.pb span{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);text-transform:capitalize}
+.pb .t{background:rgba(168,85,247,.2);border-color:rgba(168,85,247,.4);color:#e9d5ff}
+.pd{font-size:13.5px;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;min-height:20px}
+.pf{list-style:none;font-size:12.5px;color:var(--muted);display:grid;gap:4px;margin-bottom:12px}
+.pf li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:8px;box-shadow:0 0 8px var(--ok)}
+.pq{font-size:12px;color:var(--muted);padding-top:12px;border-top:1px solid var(--line);margin-bottom:14px}
+.pi{display:block;text-align:center;padding:10px;border-radius:12px;font-weight:700;font-size:13.5px;background:linear-gradient(135deg,var(--a),var(--b));opacity:.85}
+.dim{opacity:.4}
+.note{margin-top:24px;font-size:13px;color:var(--muted);text-align:center}
+.note a{color:#d8b4fe;text-decoration:none}.note a:hover{text-decoration:underline}
+.ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,4,15,.86);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .45s}
+.ov.show{opacity:1;pointer-events:auto}
+.sc{position:relative;max-width:440px;width:100%;background:linear-gradient(160deg,#0f0d1f,#161226);border:1px solid rgba(168,85,247,.35);border-radius:24px;padding:44px 32px 32px;text-align:center;box-shadow:0 40px 80px -30px rgba(0,0,0,.7),0 0 80px -20px rgba(168,85,247,.5);transform:scale(.88) translateY(20px);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.3),opacity .55s}
+.ov.show .sc{transform:none;opacity:1}
+.ck{width:92px;height:92px;margin:0 auto 22px}
+.ck svg{width:100%;height:100%;filter:drop-shadow(0 10px 24px rgba(110,231,183,.4))}
+.ck circle{fill:none;stroke:url(#g);stroke-width:4;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;animation:dr .7s cubic-bezier(.65,0,.45,1) .1s forwards}
+.ck path{fill:none;stroke:#6ee7b7;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:dr .45s cubic-bezier(.65,0,.45,1) .7s forwards}
+@keyframes dr{to{stroke-dashoffset:0}}
+.sc h2{font-size:22px;font-weight:800;margin-bottom:10px}
+.sc p{font-size:14.5px;color:var(--muted);margin-bottom:22px}
+.sc p a{color:#d8b4fe;text-decoration:none}
+.sa{display:flex;flex-direction:column;gap:10px}
+.sa .go{animation:fl 6s linear infinite}
+.gh{display:inline-flex;justify-content:center;padding:12px 24px;border-radius:999px;border:1px solid var(--line);color:var(--fg);font-weight:700;font-size:14px;text-decoration:none;transition:border-color .2s,color .2s}
+.gh:hover{border-color:var(--a);color:#d8b4fe}
+.cf{position:fixed;inset:0;pointer-events:none;z-index:10000;overflow:hidden}
+.cf i{position:absolute;top:-20px;opacity:0;animation:dp linear forwards}
+@keyframes dp{0%{opacity:1;transform:translateY(-20px) rotate(0)}85%{opacity:1}100%{opacity:0;transform:translateY(110vh) rotate(720deg)}}
+@media (max-width:960px){.layout{grid-template-columns:1fr}.preview{display:none}}
+@media (max-width:520px){.row{grid-template-columns:1fr}form{padding:20px 16px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="bg"><i class="b1"></i><i class="b2"></i><i class="grid"></i></div>
+<div class="bar"><i id="bar"></i></div>
 <main>
-<h1>Submit Theme or Plugin</h1>
-<p class="sub">RJ Nexus registry accepts themes and plugins from the community. Fill the form and submit — no GitHub account required.</p>
-<div class="flow">
-<span>Fill form</span><span>Submit</span><span>Auto PR</span><span>CI check</span><span>Review</span><span>Merged</span>
-</div>
-<form id="form" novalidate>
+<header class="hero">
+<span class="pill"><b></b>Open registry</span>
+<h1>Submit a Theme or Plugin</h1>
+<p class="sub">Share your work with every RJ Nexus install. Fill in the form, a bot opens the Pull Request, and maintainers review it.</p>
+<ol class="flow"><li style="--n:0">Fill form</li><li style="--n:1">Submit</li><li style="--n:2">Auto PR</li><li style="--n:3">CI check</li><li style="--n:4">Review</li><li style="--n:5">Merged</li></ol>
+</header>
 
+<div class="layout">
+<form id="form" novalidate>
 <fieldset>
 <legend>Basic</legend>
-
-<label for="repo">Repository (owner/repo)</label>
-<input id="repo" name="repo" placeholder="mr-ruhid/rj-theme-default" autocomplete="off" spellcheck="false" required>
-<div class="hint">Public GitHub repository with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
-<div class="err" id="err-repo">Repository must match format: owner/repo</div>
-
-<div class="row">
-<div>
-<label for="type">Type</label>
-<select id="type" name="type">
-<option value="theme">Theme</option>
-<option value="plugin">Plugin</option>
-</select>
+<div class="f">
+<label for="repo">Repository</label>
+<input id="repo" placeholder="owner/repo or full GitHub URL" autocomplete="off" spellcheck="false" aria-describedby="err-repo">
+<div class="hint">Public repo with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
+<div class="err" id="err-repo"></div>
 </div>
-<div>
-<label for="category">Category</label>
-<select id="category" name="category">
-<option value="general">General</option>
-<option value="blog">Blog</option>
-<option value="portfolio">Portfolio</option>
-<option value="business">Business</option>
-<option value="ecommerce">E-commerce</option>
-<option value="landing">Landing</option>
-<option value="agency">Agency</option>
-<option value="forms">Forms</option>
-<option value="seo">SEO</option>
-<option value="marketing">Marketing</option>
-<option value="analytics">Analytics</option>
-<option value="security">Security</option>
-<option value="media">Media</option>
-<option value="social">Social</option>
-<option value="developer">Developer</option>
-<option value="other">Other</option>
-</select>
+<div class="f">
+<span class="lab">Type</span>
+<div class="seg" id="seg" data-v="theme" role="radiogroup" aria-label="Type"><i></i>
+<button type="button" role="radio" aria-checked="true" data-v="theme">Theme</button>
+<button type="button" role="radio" aria-checked="false" data-v="plugin">Plugin</button></div>
 </div>
+<div class="f">
+<span class="lab">Category</span>
+<div class="chips" id="chips" role="radiogroup" aria-label="Category"></div>
 </div>
-
-<div class="row">
-<div>
-<label for="name">Display Name</label>
-<input id="name" name="name" placeholder="RJ Default" maxlength="80" required>
+<div class="row f">
+<div><label for="name">Display name</label><input id="name" placeholder="RJ Default" maxlength="80" aria-describedby="err-name"><div class="err" id="err-name"></div></div>
+<div><label for="version">Version</label><input id="version" placeholder="1.0.0" maxlength="30" aria-describedby="err-version"><div class="err" id="err-version"></div></div>
 </div>
-<div>
-<label for="version">Version</label>
-<input id="version" name="version" placeholder="1.0.0" maxlength="30" required>
-</div>
-</div>
-
+<div class="f">
 <label for="author">Author (GitHub username)</label>
-<input id="author" name="author" placeholder="mr-ruhid" maxlength="80" required>
-<div class="err" id="err-author">Author is required</div>
-
-<label for="tags">Tags (comma separated, max 8)</label>
-<input id="tags" name="tags" placeholder="minimal, blog, dark" autocomplete="off">
+<input id="author" placeholder="your-username" maxlength="80" aria-describedby="err-author">
+<div class="err" id="err-author"></div>
+</div>
+<div class="f">
+<label for="tagin">Tags <span class="cnt" id="tagcnt">0/8</span></label>
+<div class="tags" id="tags"><input id="tagin" placeholder="Type a tag, press Enter" autocomplete="off" maxlength="30"></div>
+<div class="hint">Lowercase, hyphen-separated. Press Enter or comma to add.</div>
+</div>
 </fieldset>
 
 <fieldset>
 <legend>Media</legend>
-
+<div class="f">
 <label for="logo">Logo URL (optional)</label>
-<input id="logo" name="logo" placeholder="https://example.com/logo.png" autocomplete="off">
+<input id="logo" placeholder="https://example.com/logo.png" autocomplete="off" aria-describedby="err-logo">
 <div class="hint">Direct image URL. No account needed: <a href="https://freeimage.host" target="_blank" rel="noopener">freeimage.host</a>, <a href="https://imgbb.com" target="_blank" rel="noopener">imgbb.com</a>.</div>
-<div class="err" id="err-logo">Must be a valid https URL</div>
-
+<div class="err" id="err-logo"></div>
+</div>
+<div class="f">
 <label for="screenshots">Screenshots (one URL per line, max 8, optional)</label>
-<textarea id="screenshots" name="screenshots" placeholder="https://i.imgur.com/abc.png&#10;https://i.imgur.com/def.png"></textarea>
-<div class="err" id="err-screenshots">Each line must be a valid https URL</div>
+<textarea id="screenshots" placeholder="https://i.imgur.com/abc.png&#10;https://i.imgur.com/def.png" aria-describedby="err-screenshots"></textarea>
+<div class="err" id="err-screenshots"></div>
+</div>
 </fieldset>
 
 <fieldset>
 <legend>Details</legend>
-
-<label for="description">Short Description</label>
-<textarea id="description" name="description" placeholder="One or two sentences about what makes it useful." maxlength="500" required></textarea>
-<div class="err" id="err-description">Description is required</div>
-
+<div class="f">
+<label for="description">Short description <span class="cnt" id="desccnt">0/500</span></label>
+<textarea id="description" placeholder="One or two sentences about what makes it useful." maxlength="500" aria-describedby="err-description"></textarea>
+<div class="err" id="err-description"></div>
+</div>
+<div class="f">
 <label for="features">Features (one per line, max 12)</label>
-<textarea id="features" name="features" placeholder="Minimal and clean design&#10;Fully responsive&#10;RJBuilder ready"></textarea>
+<textarea id="features" placeholder="Minimal and clean design&#10;Fully responsive&#10;RJBuilder ready"></textarea>
+</div>
 </fieldset>
 
 <fieldset>
 <legend>Installation</legend>
-
-<label for="steps">Installation Steps (one per line, max 15)</label>
-<textarea id="steps" name="steps" placeholder="Download the ZIP from the releases page&#10;Go to Admin → Appearance → Themes&#10;Upload the ZIP file&#10;Click Activate" required></textarea>
-<div class="err" id="err-steps">At least one step is required</div>
+<div class="f">
+<label for="steps">Steps (one per line, max 15)</label>
+<textarea id="steps" placeholder="Download the ZIP from the releases page&#10;Go to Admin → Appearance → Themes&#10;Upload the ZIP file&#10;Click Activate" aria-describedby="err-steps"></textarea>
+<div class="err" id="err-steps"></div>
+</div>
 </fieldset>
 
 <fieldset>
 <legend>Development</legend>
-
+<div class="f">
 <label for="requires">Requirements</label>
-<input id="requires" name="requires" placeholder="RJ Nexus >= 1.8.0, PHP >= 8.2" maxlength="120" required>
-<div class="err" id="err-requires">Requirements are required</div>
-
+<input id="requires" placeholder="RJ Nexus >= 1.8.0, PHP >= 8.2" maxlength="120" aria-describedby="err-requires">
+<div class="err" id="err-requires"></div>
+</div>
+<div class="f">
 <label for="docs">Documentation URL</label>
-<input id="docs" name="docs" placeholder="https://github.com/owner/repo#readme" required>
-<div class="err" id="err-docs">Must be a valid https URL</div>
+<input id="docs" placeholder="https://github.com/owner/repo#readme" autocomplete="off" aria-describedby="err-docs">
+<div class="err" id="err-docs"></div>
+</div>
 </fieldset>
 
-<button type="submit" id="submit-btn">Submit to Registry</button>
-<div class="status" id="status"></div>
+<button type="submit" class="go" id="btn">Submit to Registry</button>
+<div class="status" id="status" role="alert"></div>
 </form>
-<p class="note">A bot validates your submission and opens a Pull Request. Maintainers review and merge. <a href="https://github.com/rj-nexus/rj-registration" target="_blank" rel="noopener">View repository</a></p>
+
+<aside class="preview" aria-label="Live preview">
+<div class="pc">
+<div class="pl">Live preview</div>
+<div class="ph"><div class="pg" id="pg">?</div><div><div class="pn dim" id="pn">Your package name</div><div class="pm" id="pm">by author · v1.0.0</div></div></div>
+<div class="pb"><span class="t" id="pt">Theme</span><span id="pc2">General</span></div>
+<div class="pd dim" id="pd">Your description appears here.</div>
+<ul class="pf" id="pf"></ul>
+<div class="pq" id="pq">Requires: —</div>
+<span class="pi">Install</span>
+</div>
+</aside>
+</div>
+<p class="note">A bot validates your submission and opens a Pull Request. <a href="https://github.com/rj-nexus/rj-registration" target="_blank" rel="noopener">View repository</a></p>
 </main>
 
-<div class="success-overlay" id="success-overlay" aria-hidden="true">
-<div class="success-card" role="dialog" aria-labelledby="success-title">
-<div class="check-circle">
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="grad-ok" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#6ee7b7"/>
-<stop offset="1" stop-color="#a855f7"/>
-</linearGradient>
-</defs>
-<circle cx="50" cy="50" r="45"/>
-<path d="M30 52 L44 66 L72 38"/>
-</svg>
-</div>
-<h2 id="success-title">Submission Sent</h2>
-<p>Your theme or plugin is being reviewed. The registry bot is opening a Pull Request — you can follow progress on <a href="https://github.com/rj-nexus/rj-registration/pulls" target="_blank" rel="noopener">GitHub</a>.</p>
-<div class="success-actions">
-<button type="button" class="btn-primary" id="another-btn">Submit Another</button>
-<a href="https://github.com/rj-nexus/rj-registration/pulls" target="_blank" rel="noopener" class="btn-ghost">View Pull Requests</a>
+<div class="ov" id="ov" aria-hidden="true">
+<div class="sc" role="dialog" aria-labelledby="st">
+<div class="ck"><svg viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><circle cx="50" cy="50" r="45"/><path d="M30 52 L44 66 L72 38"/></svg></div>
+<h2 id="st">Submission sent</h2>
+<p>The registry bot is opening a Pull Request. Follow progress on <a href="https://github.com/rj-nexus/rj-registration/pulls" target="_blank" rel="noopener">GitHub</a>.</p>
+<div class="sa"><button type="button" class="go" id="again">Submit another</button><a class="gh" href="https://github.com/rj-nexus/rj-registration/pulls" target="_blank" rel="noopener">View Pull Requests</a></div>
 </div>
 </div>
-</div>
-
-<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="cf" id="cf" aria-hidden="true"></div>
 
 <script>
 (function(){
-var WORKER_URL = "https://twilight-art-0b0e.ruhidjavadoff.workers.dev/submit";
-var form=document.getElementById("form");
-var btn=document.getElementById("submit-btn");
-var status=document.getElementById("status");
-var overlay=document.getElementById("success-overlay");
-var anotherBtn=document.getElementById("another-btn");
-var confetti=document.getElementById("confetti");
+var WORKER_URL="https://twilight-art-0b0e.ruhidjavadoff.workers.dev/submit";
+var CATS={theme:["general","blog","portfolio","business","ecommerce","landing","agency","other"],plugin:["general","ecommerce","forms","seo","marketing","analytics","security","media","social","developer","other"]};
+var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/,verRe=/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/,urlRe=/^https:\/\/[^\s]+$/i;
+var $=function(i){return document.getElementById(i)};
+var st={type:"theme",cat:"general",tags:[]},touched={};
+var form=$("form"),btn=$("btn"),status=$("status"),ov=$("ov");
 
-var el=function(id){return document.getElementById(id)};
-var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-var verRe=/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/;
-var urlRe=/^https:\/\/[^\s]+$/i;
+function lines(v,m){return v.split(/\r?\n/).map(function(s){return s.trim()}).filter(Boolean).slice(0,m)}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
-function showErr(id,show){
-var e=el("err-"+id);
-if(e)e.classList.toggle("show",!!show);
+function renderCats(){
+var box=$("chips");box.textContent="";
+CATS[st.type].forEach(function(c,i){
+var b=document.createElement("button");b.type="button";b.className="chip";b.setAttribute("role","radio");
+b.setAttribute("aria-checked",c===st.cat);b.textContent=cap(c);b.style.animationDelay=i*30+"ms";
+b.onclick=function(){st.cat=c;renderCats();update()};box.appendChild(b);
+});
 }
-function mark(id,ok){
-var f=el(id);
-if(f)f.classList.toggle("invalid",!ok);
+function setType(t){
+st.type=t;if(CATS[t].indexOf(st.cat)<0)st.cat="general";
+$("seg").setAttribute("data-v",t);
+$("seg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-checked",b.dataset.v===t)});
+renderCats();update();
 }
-function cleanLines(v,max){
-return v.split(/\r?\n/).map(function(s){return s.trim()}).filter(Boolean).slice(0,max||999);
+$("seg").querySelectorAll("button").forEach(function(b){b.onclick=function(){setType(b.dataset.v)}});
+
+function renderTags(){
+var box=$("tags"),inp=$("tagin");
+box.querySelectorAll(".tag").forEach(function(n){n.remove()});
+st.tags.forEach(function(t,i){
+var s=document.createElement("span");s.className="tag";s.textContent=t;
+var x=document.createElement("button");x.type="button";x.setAttribute("aria-label","Remove "+t);x.textContent="×";
+x.onclick=function(){st.tags.splice(i,1);renderTags();update()};
+s.appendChild(x);box.insertBefore(s,inp);
+});
+$("tagcnt").textContent=st.tags.length+"/8";
 }
-function cleanTags(v){
-return v.split(",").map(function(t){return t.trim().toLowerCase()})
-.filter(Boolean)
-.filter(function(x){return /^[a-z0-9-]+$/.test(x)})
-.filter(function(x,i,a){return a.indexOf(x)===i})
-.slice(0,8);
+function addTag(raw){
+var t=raw.trim().toLowerCase().replace(/\s+/g,"-").replace(/[^a-z0-9-]/g,"").replace(/^-+|-+$/g,"");
+if(t&&st.tags.indexOf(t)<0&&st.tags.length<8){st.tags.push(t);renderTags();update()}
+$("tagin").value="";
 }
-function setStatus(kind,html){
-status.className="status show "+kind;
-status.innerHTML=html;
+$("tagin").addEventListener("keydown",function(e){
+if(e.key==="Enter"||e.key===","){e.preventDefault();addTag(this.value)}
+else if(e.key==="Backspace"&&!this.value&&st.tags.length){st.tags.pop();renderTags();update()}
+});
+$("tagin").addEventListener("blur",function(){if(this.value)addTag(this.value)});
+
+function normRepo(v){
+v=v.trim().replace(/^https?:\/\/(www\.)?github\.com\//i,"").replace(/\.git$/i,"").replace(/[#?].*$/,"");
+var p=v.split("/").filter(Boolean);
+return p.length>=2?p[0]+"/"+p[1]:v;
 }
-function fireConfetti(){
-var colors=["#a855f7","#ec4899","#f59e0b","#6ee7b7","#93c5fd","#f9a8d4"];
-var total=90;
-confetti.innerHTML="";
-for(var i=0;i<total;i++){
-var p=document.createElement("i");
-var size=6+Math.random()*8;
-p.style.left=(Math.random()*100)+"%";
-p.style.width=size+"px";
-p.style.height=size+"px";
-p.style.background=colors[(Math.random()*colors.length)|0];
-p.style.borderRadius=Math.random()>.5?"50%":"2px";
-p.style.animationDuration=(1.6+Math.random()*1.8)+"s";
-p.style.animationDelay=(Math.random()*0.4)+"s";
-confetti.appendChild(p);
-}
-setTimeout(function(){confetti.innerHTML=""},3600);
-}
-function openSuccess(){
-overlay.classList.add("show");
-overlay.setAttribute("aria-hidden","false");
-document.body.style.overflow="hidden";
-fireConfetti();
-}
-function closeSuccess(){
-overlay.classList.remove("show");
-overlay.setAttribute("aria-hidden","true");
-document.body.style.overflow="";
+var rules={
+repo:function(v){return repoRe.test(v)?"":"Use the format owner/repo"},
+name:function(v){return v?"":"Name is required"},
+version:function(v){return verRe.test(v)?"":"Use semantic versioning, for example 1.0.0"},
+author:function(v){return v?"":"Author is required"},
+logo:function(v){return !v||urlRe.test(v)?"":"Must be a valid https URL"},
+screenshots:function(v){return lines(v,8).every(function(u){return urlRe.test(u)})?"":"Each line must be a valid https URL"},
+description:function(v){return v?"":"Description is required"},
+steps:function(v){return lines(v,15).length?"":"At least one step is required"},
+requires:function(v){return v?"":"Requirements are required"},
+docs:function(v){return urlRe.test(v)?"":"Must be a valid https URL"}
+};
+function check(id,show){
+var f=$(id),msg=rules[id](f.value.trim());
+if(show){f.setAttribute("aria-invalid",msg?"true":"false");$("err-"+id).textContent=msg}
+return msg;
 }
 
-el("repo").addEventListener("input",function(){
-var ok=repoRe.test(this.value.trim());
-mark("repo",ok);showErr("repo",!ok&&this.value.length>0);
-});
-el("author").addEventListener("input",function(){
-var ok=this.value.trim().length>0;
-mark("author",ok);showErr("author",!ok&&this.value.length>0);
-});
-el("logo").addEventListener("input",function(){
-var v=this.value.trim();
-var ok=v===""||urlRe.test(v);
-mark("logo",ok);showErr("logo",!ok);
-});
-el("screenshots").addEventListener("input",function(){
-var lines=cleanLines(this.value,8);
-var ok=lines.every(function(u){return urlRe.test(u)});
-mark("screenshots",ok);showErr("screenshots",!ok);
-});
-el("docs").addEventListener("input",function(){
-var v=this.value.trim();
-var ok=urlRe.test(v);
-mark("docs",ok);showErr("docs",!ok&&v.length>0);
-});
+function update(){
+var req=["repo","name","version","author","description","steps","requires","docs"],ok=0;
+req.forEach(function(id){if(!rules[id]($(id).value.trim()))ok++});
+if(!rules.logo($("logo").value.trim())&&!rules.screenshots($("screenshots").value))ok+=0;
+$("bar").style.width=Math.round(ok/req.length*100)+"%";
+var n=$("name").value.trim(),a=$("author").value.trim(),v=$("version").value.trim(),d=$("description").value.trim(),lg=$("logo").value.trim();
+$("pn").textContent=n||"Your package name";$("pn").classList.toggle("dim",!n);
+$("pm").textContent="by "+(a||"author")+" · v"+(v||"1.0.0");
+$("pt").textContent=cap(st.type);$("pc2").textContent=cap(st.cat);
+$("pd").textContent=d||"Your description appears here.";$("pd").classList.toggle("dim",!d);
+var pg=$("pg");pg.textContent="";
+if(lg&&urlRe.test(lg)){var im=new Image();im.alt="";im.onload=function(){pg.textContent="";pg.appendChild(im)};im.onerror=function(){pg.textContent=(n||"?").charAt(0).toUpperCase()};im.src=lg;pg.textContent=(n||"?").charAt(0).toUpperCase()}
+else pg.textContent=(n||"?").charAt(0).toUpperCase();
+var pf=$("pf");pf.textContent="";
+lines($("features").value,3).forEach(function(t){var li=document.createElement("li");li.textContent=t;pf.appendChild(li)});
+$("pq").textContent="Requires: "+($("requires").value.trim()||"—");
+$("desccnt").textContent=$("description").value.length+"/500";
+}
 
-anotherBtn.addEventListener("click",function(){
-closeSuccess();
-form.reset();
-btn.disabled=false;
-btn.textContent="Submit to Registry";
-window.scrollTo({top:0,behavior:"smooth"});
+$("repo").addEventListener("blur",function(){
+this.value=normRepo(this.value);check("repo",true);
+var p=this.value.split("/");
+if(repoRe.test(this.value)){
+if(!touched.author&&!$("author").value){$("author").value=p[0]}
+if(!touched.docs&&!$("docs").value){$("docs").value="https://github.com/"+this.value+"#readme"}
+}
+update();
 });
+$("version").addEventListener("blur",function(){this.value=this.value.trim().replace(/^v/i,"");check("version",true);update()});
+["author","docs"].forEach(function(id){$(id).addEventListener("input",function(){touched[id]=true})});
+Object.keys(rules).forEach(function(id){
+$(id).addEventListener("input",function(){if($(id).getAttribute("aria-invalid")==="true")check(id,true)});
+});
+["name","author","version","description","features","requires","logo","repo","steps","docs","screenshots"].forEach(function(id){$(id).addEventListener("input",update)});
 
-overlay.addEventListener("click",function(e){
-if(e.target===overlay)closeSuccess();
-});
-document.addEventListener("keydown",function(e){
-if(e.key==="Escape"&&overlay.classList.contains("show"))closeSuccess();
-});
+function fire(){
+var c=$("cf"),col=["#a855f7","#ec4899","#f59e0b","#6ee7b7","#93c5fd","#f9a8d4"];c.textContent="";
+for(var i=0;i<90;i++){var p=document.createElement("i"),s=6+Math.random()*8;
+p.style.cssText="left:"+Math.random()*100+"%;width:"+s+"px;height:"+s+"px;background:"+col[(Math.random()*col.length)|0]+";border-radius:"+(Math.random()>.5?"50%":"2px")+";animation-duration:"+(1.6+Math.random()*1.8)+"s;animation-delay:"+Math.random()*.4+"s";
+c.appendChild(p)}
+setTimeout(function(){c.textContent=""},3600);
+}
+function openOv(){ov.classList.add("show");ov.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";fire();$("again").focus()}
+function closeOv(){ov.classList.remove("show");ov.setAttribute("aria-hidden","true");document.body.style.overflow=""}
+function showError(title,msg,list){
+status.textContent="";
+var s=document.createElement("strong");s.textContent=title;status.appendChild(s);
+status.appendChild(document.createElement("br"));status.appendChild(document.createTextNode(msg));
+if(list&&list.length){var ul=document.createElement("ul");list.forEach(function(x){var li=document.createElement("li");li.textContent=String(x);ul.appendChild(li)});status.appendChild(ul)}
+status.className="status show";
+}
+function reset(){
+form.reset();st={type:"theme",cat:"general",tags:[]};touched={};
+form.querySelectorAll("[aria-invalid]").forEach(function(n){n.removeAttribute("aria-invalid")});
+form.querySelectorAll(".err").forEach(function(n){n.textContent=""});
+status.className="status";btn.disabled=false;btn.textContent="Submit to Registry";
+setType("theme");renderTags();update();
+}
+$("again").onclick=function(){closeOv();reset();window.scrollTo({top:0,behavior:"smooth"})};
+ov.addEventListener("click",function(e){if(e.target===ov)closeOv()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("show"))closeOv()});
 
 form.addEventListener("submit",function(e){
-e.preventDefault();
-status.className="status";
-var errors=[];
-
-var repo=el("repo").value.trim();
-if(!repoRe.test(repo)){errors.push("repo");mark("repo",false);showErr("repo",true)}
-
-var name=el("name").value.trim();
-if(!name){errors.push("name")}
-
-var version=el("version").value.trim();
-if(!verRe.test(version)){errors.push("version")}
-
-var author=el("author").value.trim();
-if(!author){errors.push("author");mark("author",false);showErr("author",true)}
-
-var logo=el("logo").value.trim();
-if(logo&&!urlRe.test(logo)){errors.push("logo");mark("logo",false);showErr("logo",true)}
-
-var screenshots=cleanLines(el("screenshots").value,8);
-if(screenshots.some(function(u){return !urlRe.test(u)})){errors.push("screenshots");mark("screenshots",false);showErr("screenshots",true)}
-
-var description=el("description").value.trim();
-if(!description){errors.push("description");mark("description",false);showErr("description",true)}
-
-var features=cleanLines(el("features").value,12);
-var steps=cleanLines(el("steps").value,15);
-if(!steps.length){errors.push("steps");mark("steps",false);showErr("steps",true)}
-
-var requires=el("requires").value.trim();
-if(!requires){errors.push("requires");mark("requires",false);showErr("requires",true)}
-
-var docs=el("docs").value.trim();
-if(!urlRe.test(docs)){errors.push("docs");mark("docs",false);showErr("docs",true)}
-
-if(errors.length){
-var first=el(errors[0]);
-if(first)first.scrollIntoView({behavior:"smooth",block:"center"});
-return;
-}
-
+e.preventDefault();status.className="status";
+$("repo").value=normRepo($("repo").value);
+$("version").value=$("version").value.trim().replace(/^v/i,"");
+var bad=Object.keys(rules).filter(function(id){return check(id,true)});
+if(bad.length){var f=$(bad[0]);f.scrollIntoView({behavior:"smooth",block:"center"});f.focus({preventScroll:true});return}
 var payload={
-repo:repo,
-type:el("type").value,
-category:el("category").value,
-name:name,
-version:version,
-author:author,
-tags:cleanTags(el("tags").value),
-logo:logo,
-screenshots:screenshots,
-description:description,
-features:features,
-steps:steps,
-requires:requires,
-docs:docs
+repo:$("repo").value.trim(),type:st.type,category:st.cat,name:$("name").value.trim(),version:$("version").value.trim(),
+author:$("author").value.trim(),tags:st.tags.slice(),logo:$("logo").value.trim(),screenshots:lines($("screenshots").value,8),
+description:$("description").value.trim(),features:lines($("features").value,12),steps:lines($("steps").value,15),
+requires:$("requires").value.trim(),docs:$("docs").value.trim()
 };
-
-btn.disabled=true;
-btn.textContent="Submitting";
-
-fetch(WORKER_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
-})
-.then(function(res){
-return res.json().then(function(body){return {ok:res.ok,status:res.status,body:body}});
-})
+btn.disabled=true;btn.textContent="Submitting";
+var ctl=new AbortController(),to=setTimeout(function(){ctl.abort()},25000);
+fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctl.signal})
+.then(function(res){return res.json().catch(function(){return {}}).then(function(b){return {ok:res.ok,code:res.status,body:b}})})
 .then(function(r){
-if(r.ok&&r.body.success){
-btn.textContent="Submit to Registry";
-openSuccess();
-}else{
-var msg=r.body&&(r.body.error||r.body.details)?(r.body.error||r.body.details):("HTTP "+r.status);
-var fields=r.body&&r.body.fields?"<ul><li>"+r.body.fields.join("</li><li>")+"</li></ul>":"";
-setStatus("error","<strong>Submission failed.</strong><br>"+msg+fields);
-btn.disabled=false;
-btn.textContent="Try again";
-}
+clearTimeout(to);
+if(r.ok&&r.body.success){btn.disabled=false;btn.textContent="Submit to Registry";openOv()}
+else{showError("Submission failed.",String(r.body.error||r.body.details||("HTTP "+r.code)),Array.isArray(r.body.fields)?r.body.fields:null);btn.disabled=false;btn.textContent="Try again"}
 })
-.catch(function(e){
-setStatus("error","<strong>Network error.</strong><br>"+e.message);
-btn.disabled=false;
-btn.textContent="Try again";
+.catch(function(err){
+clearTimeout(to);
+showError("Network error.",err&&err.name==="AbortError"?"The request timed out. Please try again.":(err&&err.message)||"Request failed.");
+btn.disabled=false;btn.textContent="Try again";
 });
 });
+
+renderCats();renderTags();update();
 })();
 </script>
 </body>
