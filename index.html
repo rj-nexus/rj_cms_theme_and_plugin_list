@@ -13,22 +13,28 @@
 }
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;padding:32px 16px}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 75% 25%,#1c1450 0%,#0d0a2b 50%,#05040f 100%)}
-main{position:relative;z-index:1;max-width:640px;margin:0 auto}
+main{position:relative;z-index:1;max-width:680px;margin:0 auto}
 h1{font-size:28px;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#fff,#e9d5ff,#f9a8d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .sub{color:var(--muted);margin-bottom:24px;font-size:14px}
 .flow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;font-size:12px;color:var(--muted);align-items:center}
 .flow span{padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:999px}
 .flow span+i::before{content:"→ ";margin-left:-6px;margin-right:2px;color:var(--accent)}
 form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+fieldset{border:0;padding:0;margin:0 0 20px}
+legend{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);width:100%}
 label{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 input,select,textarea{width:100%;background:var(--card2);border:1.5px solid var(--border);color:var(--fg);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:14.5px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:18px}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(168,85,247,.16)}
-textarea{min-height:96px;resize:vertical}
-input.invalid{border-color:var(--err)}
+textarea{min-height:88px;resize:vertical}
+input.invalid,textarea.invalid{border-color:var(--err)}
 .hint{font-size:12px;color:var(--muted);margin:-12px 0 18px}
 .hint code{background:var(--card2);padding:2px 6px;border-radius:4px;font-size:11.5px;color:var(--accent)}
+.hint a{color:var(--accent);text-decoration:none}
+.hint a:hover{text-decoration:underline}
 .err{color:var(--err);font-size:12px;margin:-12px 0 12px;display:none}
 .err.show{display:block}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row input,.row select{margin-bottom:18px}
 button{width:100%;padding:14px 24px;border:0;border-radius:999px;background:linear-gradient(110deg,#7c3aed,#ec4899,#f59e0b,#7c3aed);background-size:300% 100%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.03em;cursor:pointer;animation:flow-bg 6s linear infinite;transition:transform .2s,box-shadow .2s;font-family:inherit}
 button:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(236,72,153,.7)}
 button:active{transform:scale(.98)}
@@ -36,6 +42,7 @@ button:active{transform:scale(.98)}
 .note{margin-top:20px;font-size:13px;color:var(--muted);text-align:center}
 .note a{color:var(--accent);text-decoration:none}
 .note a:hover{text-decoration:underline}
+@media (max-width:520px){.row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -46,17 +53,24 @@ button:active{transform:scale(.98)}
 <span>Fill form</span><span>Confirm on GitHub</span><span>Auto PR</span><span>CI check</span><span>Review</span><span>Merged</span>
 </div>
 <form id="form" novalidate>
+
+<fieldset>
+<legend>Basic</legend>
+
 <label for="repo">Repository (owner/repo)</label>
 <input id="repo" name="repo" placeholder="mr-ruhid/rj-theme-default" autocomplete="off" spellcheck="false" required>
 <div class="hint">GitHub repository with <code>theme.json</code> or <code>plugin.json</code> at its root.</div>
 <div class="err" id="err-repo">Repository must match format: owner/repo</div>
 
+<div class="row">
+<div>
 <label for="type">Type</label>
 <select id="type" name="type">
 <option value="theme">Theme</option>
 <option value="plugin">Plugin</option>
 </select>
-
+</div>
+<div>
 <label for="category">Category</label>
 <select id="category" name="category">
 <option value="general">General</option>
@@ -66,14 +80,81 @@ button:active{transform:scale(.98)}
 <option value="ecommerce">E-commerce</option>
 <option value="landing">Landing</option>
 <option value="agency">Agency</option>
+<option value="forms">Forms</option>
+<option value="seo">SEO</option>
+<option value="marketing">Marketing</option>
+<option value="analytics">Analytics</option>
+<option value="security">Security</option>
+<option value="media">Media</option>
+<option value="social">Social</option>
+<option value="developer">Developer</option>
 <option value="other">Other</option>
 </select>
+</div>
+</div>
 
-<label for="tags">Tags (comma separated)</label>
+<div class="row">
+<div>
+<label for="name">Display Name</label>
+<input id="name" name="name" placeholder="RJ Default" maxlength="80" required>
+</div>
+<div>
+<label for="version">Version</label>
+<input id="version" name="version" placeholder="1.0.0" maxlength="30" required>
+</div>
+</div>
+
+<label for="author">Author (GitHub username)</label>
+<input id="author" name="author" placeholder="mr-ruhid" maxlength="80" required>
+<div class="err" id="err-author">Author is required</div>
+
+<label for="tags">Tags (comma separated, max 8)</label>
 <input id="tags" name="tags" placeholder="minimal, blog, dark" autocomplete="off">
+</fieldset>
+
+<fieldset>
+<legend>Media</legend>
+
+<label for="logo">Logo URL (optional)</label>
+<input id="logo" name="logo" placeholder="https://example.com/logo.png" autocomplete="off">
+<div class="hint">Direct image URL. Need hosting? Use <a href="https://freeimage.host" target="_blank" rel="noopener">freeimage.host</a> or <a href="https://imgbb.com" target="_blank" rel="noopener">imgbb.com</a> — no account required.</div>
+<div class="err" id="err-logo">Must be a valid https URL</div>
+
+<label for="screenshots">Screenshots (one URL per line, max 8, optional)</label>
+<textarea id="screenshots" name="screenshots" placeholder="https://i.imgur.com/abc.png&#10;https://i.imgur.com/def.png"></textarea>
+<div class="err" id="err-screenshots">Each line must be a valid https URL</div>
+</fieldset>
+
+<fieldset>
+<legend>Details</legend>
 
 <label for="description">Short Description</label>
-<textarea id="description" name="description" placeholder="One or two sentences about what makes it useful." maxlength="300"></textarea>
+<textarea id="description" name="description" placeholder="One or two sentences about what makes it useful." maxlength="500" required></textarea>
+<div class="err" id="err-description">Description is required</div>
+
+<label for="features">Features (one per line, max 12)</label>
+<textarea id="features" name="features" placeholder="Minimal and clean design&#10;Fully responsive&#10;RJBuilder ready"></textarea>
+</fieldset>
+
+<fieldset>
+<legend>Installation</legend>
+
+<label for="steps">Installation Steps (one per line, max 15)</label>
+<textarea id="steps" name="steps" placeholder="Download the ZIP from the releases page&#10;Go to Admin → Appearance → Themes&#10;Upload the ZIP file&#10;Click Activate" required></textarea>
+<div class="err" id="err-steps">At least one step is required</div>
+</fieldset>
+
+<fieldset>
+<legend>Development</legend>
+
+<label for="requires">Requirements</label>
+<input id="requires" name="requires" placeholder="RJ Nexus >= 1.8.0, PHP >= 8.2" maxlength="120" required>
+<div class="err" id="err-requires">Requirements are required</div>
+
+<label for="docs">Documentation URL</label>
+<input id="docs" name="docs" placeholder="https://github.com/owner/repo#readme" required>
+<div class="err" id="err-docs">Must be a valid https URL</div>
+</fieldset>
 
 <button type="submit">Continue on GitHub</button>
 </form>
@@ -84,60 +165,129 @@ button:active{transform:scale(.98)}
 var OWNER="rj-nexus";
 var NAME="rj_cms_theme_and_plugin_list";
 var form=document.getElementById("form");
-var repoInput=document.getElementById("repo");
-var errRepo=document.getElementById("err-repo");
-var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
-repoInput.addEventListener("input",function(){
-if(repoRe.test(repoInput.value.trim())){
-repoInput.classList.remove("invalid");
-errRepo.classList.remove("show");
+var el=function(id){return document.getElementById(id)};
+var repoRe=/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+var verRe=/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/;
+var urlRe=/^https:\/\/[^\s]+$/i;
+
+function showErr(id,show){
+var e=el("err-"+id);
+if(e)e.classList.toggle("show",!!show);
 }
+function mark(id,ok){
+var f=el(id);
+if(f)f.classList.toggle("invalid",!ok);
+}
+
+function cleanLines(v,max){
+return v.split(/\r?\n/).map(function(s){return s.trim()}).filter(Boolean).slice(0,max||999);
+}
+function cleanTags(v){
+return v.split(",").map(function(t){return t.trim().toLowerCase()})
+.filter(Boolean)
+.filter(function(x){return /^[a-z0-9-]+$/.test(x)})
+.filter(function(x,i,a){return a.indexOf(x)===i})
+.slice(0,8);
+}
+
+el("repo").addEventListener("input",function(){
+var ok=repoRe.test(this.value.trim());
+mark("repo",ok);showErr("repo",!ok&&this.value.length>0);
+});
+el("author").addEventListener("input",function(){
+var ok=this.value.trim().length>0;
+mark("author",ok);showErr("author",!ok&&this.value.length>0);
+});
+el("logo").addEventListener("input",function(){
+var v=this.value.trim();
+var ok=v===""||urlRe.test(v);
+mark("logo",ok);showErr("logo",!ok);
+});
+el("screenshots").addEventListener("input",function(){
+var lines=cleanLines(this.value,8);
+var ok=lines.every(function(u){return urlRe.test(u)});
+mark("screenshots",ok);showErr("screenshots",!ok);
+});
+el("docs").addEventListener("input",function(){
+var v=this.value.trim();
+var ok=urlRe.test(v);
+mark("docs",ok);showErr("docs",!ok&&v.length>0);
 });
 
 form.addEventListener("submit",function(e){
 e.preventDefault();
-var repo=repoInput.value.trim();
+var errors=[];
 
-if(!repoRe.test(repo)){
-repoInput.classList.add("invalid");
-errRepo.classList.add("show");
-repoInput.focus();
+var repo=el("repo").value.trim();
+if(!repoRe.test(repo)){errors.push("repo");mark("repo",false);showErr("repo",true)}
+
+var name=el("name").value.trim();
+if(!name){errors.push("name")}
+
+var version=el("version").value.trim();
+if(!verRe.test(version)){errors.push("version")}
+
+var author=el("author").value.trim();
+if(!author){errors.push("author");mark("author",false);showErr("author",true)}
+
+var logo=el("logo").value.trim();
+if(logo&&!urlRe.test(logo)){errors.push("logo");mark("logo",false);showErr("logo",true)}
+
+var screenshots=cleanLines(el("screenshots").value,8);
+if(screenshots.some(function(u){return !urlRe.test(u)})){errors.push("screenshots");mark("screenshots",false);showErr("screenshots",true)}
+
+var description=el("description").value.trim();
+if(!description){errors.push("description");mark("description",false);showErr("description",true)}
+
+var features=cleanLines(el("features").value,12);
+var steps=cleanLines(el("steps").value,15);
+if(!steps.length){errors.push("steps");mark("steps",false);showErr("steps",true)}
+
+var requires=el("requires").value.trim();
+if(!requires){errors.push("requires");mark("requires",false);showErr("requires",true)}
+
+var docs=el("docs").value.trim();
+if(!urlRe.test(docs)){errors.push("docs");mark("docs",false);showErr("docs",true)}
+
+if(errors.length){
+var first=el(errors[0]);
+if(first)first.scrollIntoView({behavior:"smooth",block:"center"});
 return;
 }
 
-var type=document.getElementById("type").value;
-var category=document.getElementById("category").value;
-var tagsRaw=document.getElementById("tags").value.trim();
-var description=document.getElementById("description").value.trim();
-
-var tags=tagsRaw.split(",")
-.map(function(t){return t.trim().toLowerCase()})
-.filter(Boolean)
-.filter(function(v,i,a){return a.indexOf(v)===i})
-.slice(0,8);
+var type=el("type").value;
+var category=el("category").value;
+var tags=cleanTags(el("tags").value);
 
 var title="[Registry] Add "+type+": "+repo;
 
 var body=[
-"### Repo",
-repo,
-"",
-"### Type",
-type,
-"",
-"### Category",
-category,
-"",
-"### Tags",
-tags.length?tags.join(", "):"(none)",
-"",
-"### Description",
-description||"(none)",
-"",
+"### Repo","`"+repo+"`","",
+"### Type",type,"",
+"### Category",category,"",
+"### Name",name,"",
+"### Version",version,"",
+"### Author",author,"",
+"### Tags",tags.length?tags.join(", "):"(none)","",
+"### Logo",logo||"(none)","",
+"### Screenshots",
+screenshots.length?screenshots.join("\n"):"(none)","",
+"### Description",description,"",
+"### Features",
+features.length?features.map(function(f){return "- "+f}).join("\n"):"(none)","",
+"### Installation Steps",
+steps.map(function(s){return "1. "+s}).join("\n"),"",
+"### Requires",requires,"",
+"### Docs",docs,"",
 "---",
 "_Submitted via the registry form._"
 ].join("\n");
+
+if(body.length>6000){
+alert("Your submission is too long. Please shorten the description, features or steps.");
+return;
+}
 
 var url="https://github.com/"+OWNER+"/"+NAME+"/issues/new"
 +"?title="+encodeURIComponent(title)
