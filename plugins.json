@@ -1,4 +1,73 @@
 {
   "$schema": "https://raw.githubusercontent.com/rj-nexus/rj_cms_theme_and_plugin_list/main/schema/plugin.schema.json",
-  "plugins": [ ... ]
+  "plugins": [
+    {
+      "repo": "rj-nexus/rj-commerce",
+      "name": "RJ Commerce",
+      "author": "rj-nexus",
+      "version": "1.0.0",
+      "verified": true,
+      "featured": true,
+      "category": "ecommerce",
+      "tags": ["ecommerce", "shopping-cart", "products", "orders", "payments"],
+      "logo": "",
+      "screenshots": [],
+      "details": {
+        "description": "Full e-commerce plugin for RJ Nexus. Products, cart, orders, payments and more.",
+        "features": [
+          "Product management",
+          "Shopping cart",
+          "Order tracking",
+          "Multiple payment gateways",
+          "Inventory management"
+        ]
+      },
+      "installation": {
+        "steps": [
+          "Download the ZIP from the releases page",
+          "Go to Admin → Plugins → Upload Plugin",
+          "Select the ZIP and click Upload",
+          "Click Activate next to the plugin"
+        ]
+      },
+      "development": {
+        "requires": "RJ Nexus >= 1.8.0, PHP >= 8.2",
+        "docs": "https://github.com/rj-nexus/rj-commerce#readme"
+      }
+    },
+    {
+      "repo": "rj-nexus/form-builder",
+      "name": "Form Builder",
+      "author": "rj-nexus",
+      "version": "1.1.1",
+      "verified": true,
+      "featured": false,
+      "category": "forms",
+      "tags": ["forms", "builder", "submissions"],
+      "logo": "",
+      "screenshots": [],
+      "details": {
+        "description": "Create, manage, and embed forms. Includes RJBuilder widget and admin panel.",
+        "features": [
+          "Drag & drop form builder",
+          "Multiple field types",
+          "Submissions management",
+          "RJBuilder widget integration",
+          "Fully isolated architecture"
+        ]
+      },
+      "installation": {
+        "steps": [
+          "Download the ZIP from the releases page",
+          "Go to Admin → Plugins → Upload Plugin",
+          "Select the ZIP and click Upload",
+          "Click Activate next to the plugin"
+        ]
+      },
+      "development": {
+        "requires": "RJ Nexus >= 1.8.0, PHP >= 8.2",
+        "docs": "https://github.com/rj-nexus/form-builder#readme"
+      }
+    }
+  ]
 }
