@@ -1,0 +1,211 @@
+name: Registry Dispatch
+
+on:
+  repository_dispatch:
+    types: [registry_submission]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse and validate payload
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const d = context.payload.client_payload || {};
+            const clean = (v) => (v || '').toString().replace(/^`|`$/g, '').trim();
+            const list = (v) => Array.isArray(v) ? v.map(s => (s || '').toString().trim()).filter(Boolean) : [];
+            const data = {
+              repo: clean(d.repo),
+              type: (clean(d.type)).toLowerCase(),
+              category: (clean(d.category) || 'other').toLowerCase(),
+              name: clean(d.name),
+              version: clean(d.version),
+              author: clean(d.author),
+              tags: Array.isArray(d.tags) ? d.tags.map(t => (t || '').toLowerCase().trim()).filter(Boolean).slice(0, 8) : [],
+              logo: clean(d.logo).replace(/^\(none\)$/i, ''),
+              screenshots: list(d.screenshots).filter(s => !/^\(none\)$/i.test(s)).slice(0, 8),
+              description: clean(d.description),
+              features: list(d.features).slice(0, 12),
+              steps: list(d.steps).slice(0, 15),
+              requires: clean(d.requires),
+              docs: clean(d.docs)
+            };
+            const errors = [];
+            const repoRe = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+            const verRe = /^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/;
+            const urlRe = /^https:\/\/[^\s]+$/i;
+            if (!repoRe.test(data.repo)) errors.push('Invalid repo format (owner/repo expected)');
+            if (!['theme', 'plugin'].includes(data.type)) errors.push('Type must be theme or plugin');
+            if (!data.name) errors.push('Name is required');
+            if (!verRe.test(data.version)) errors.push('Invalid version (semver expected)');
+            if (!data.author) errors.push('Author is required');
+            if (!data.description) errors.push('Description is required');
+            if (!data.steps.length) errors.push('Installation steps required');
+            if (!data.requires) errors.push('Requires field required');
+            if (!urlRe.test(data.docs)) errors.push('Docs URL must be https');
+            if (data.logo && !urlRe.test(data.logo)) errors.push('Logo URL must be https');
+            if (data.screenshots.some(u => !urlRe.test(u))) errors.push('Screenshots must be https URLs');
+            if (errors.length) {
+              core.setFailed('Validation failed:\n' + errors.join('\n'));
+              return;
+            }
+            fs.writeFileSync('/tmp/payload.json', JSON.stringify(data));
+            core.setOutput('data', JSON.stringify(data));
+
+      - name: Fetch manifest from target repo
+        id: manifest
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const d = JSON.parse(core.getOutput('data'));
+            const [owner, repo] = d.repo.split('/');
+            const file = d.type === 'theme' ? 'theme.json' : 'plugin.json';
+            for (const b of ['main', 'master']) {
+              try {
+                const res = await github.rest.repos.getContent({ owner, repo, path: file, ref: b });
+                const m = JSON.parse(Buffer.from(res.data.content, 'base64').toString('utf8'));
+                if (!m.name) throw new Error('Manifest missing "name"');
+                if (!m.version) throw new Error('Manifest missing "version"');
+                if (m.name.trim().toLowerCase() !== d.name.trim().toLowerCase()) {
+                  throw new Error(`Manifest name "${m.name}" does not match submission name "${d.name}"`);
+                }
+                core.setOutput('manifest_ok', 'true');
+                return;
+              } catch (e) {
+                if (e.status !== 404) {
+                  core.setFailed(`Manifest check failed: ${e.message}`);
+                  return;
+                }
+              }
+            }
+            core.setFailed(`Cannot find valid ${file} at root of ${d.repo} on main or master`);
+
+      - name: Append entry to JSON
+        id: append
+        run: |
+          node -e "
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('/tmp/payload.json', 'utf8'));
+          const file = d.type === 'theme' ? 'themes.json' : 'plugins.json';
+          const root = d.type === 'theme' ? 'themes' : 'plugins';
+          const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const exists = data[root].some(e => e.repo.toLowerCase() === d.repo.toLowerCase());
+          if (exists) {
+            console.log('DUPLICATE::' + file);
+            process.exit(0);
+          }
+          data[root].push({
+            repo: d.repo,
+            name: d.name,
+            author: d.author,
+            version: d.version,
+            verified: false,
+            featured: false,
+            category: d.category || 'other',
+            tags: d.tags,
+            logo: d.logo || '',
+            screenshots: d.screenshots,
+            details: { description: d.description, features: d.features },
+            installation: { steps: d.steps },
+            development: { requires: d.requires, docs: d.docs }
+          });
+          fs.writeFileSync(file, JSON.stringify(data, null, 2) + '\n');
+          console.log('OK::' + file);
+          "
+
+      - name: Update registry index
+        run: |
+          node -e "
+          const fs = require('fs');
+          const reg = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+          const themes = JSON.parse(fs.readFileSync('themes.json', 'utf8')).themes;
+          const plugins = JSON.parse(fs.readFileSync('plugins.json', 'utf8')).plugins;
+          const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+          reg.updated_at = now;
+          reg.themes.count = themes.length;
+          reg.themes.updated_at = now;
+          reg.plugins.count = plugins.length;
+          reg.plugins.updated_at = now;
+          fs.writeFileSync('registry.json', JSON.stringify(reg, null, 2) + '\n');
+          "
+
+      - name: Detect duplicate
+        id: dup
+        run: |
+          if git diff --quiet; then
+            echo "duplicate=true" >> $GITHUB_OUTPUT
+          else
+            echo "duplicate=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail on duplicate
+        if: steps.dup.outputs.duplicate == 'true'
+        run: |
+          echo "Repository is already listed in the registry."
+          exit 1
+
+      - name: Create branch and commit
+        if: steps.dup.outputs.duplicate == 'false'
+        id: commit
+        run: |
+          PAYLOAD=$(cat /tmp/payload.json)
+          REPO=$(node -e "console.log(JSON.parse(process.argv[1]).repo)" "$PAYLOAD")
+          TYPE=$(node -e "console.log(JSON.parse(process.argv[1]).type)" "$PAYLOAD")
+          SLUG=$(echo "$REPO" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+          BRANCH="registry/add-${SLUG}-$(date +%s)"
+          git config user.email "bot@rjnexus.org"
+          git config user.name "RJ Registry Bot"
+          git checkout -b "$BRANCH"
+          git add themes.json plugins.json registry.json
+          git commit -m "feat(registry): add ${TYPE} ${REPO}"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "repo=$REPO" >> $GITHUB_OUTPUT
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+
+      - name: Open pull request
+        if: steps.dup.outputs.duplicate == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const d = JSON.parse(core.getOutput('data'));
+            const branch = '${{ steps.commit.outputs.branch }}';
+            const base = context.payload.repository.default_branch;
+            const body = [
+              'Submitted via the registry form.',
+              '',
+              `- **Repo:** \`${d.repo}\``,
+              `- **Type:** ${d.type}`,
+              `- **Category:** ${d.category}`,
+              `- **Version:** ${d.version}`,
+              `- **Author:** ${d.author}`,
+              '',
+              'Auto-generated by the Cloudflare Worker dispatch.'
+            ].join('\n');
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Add ${d.type}: ${d.repo}`,
+              head: branch,
+              base: base,
+              body
+            });
+            core.info(`PR opened: #${pr.data.number} ${pr.data.html_url}`);
